@@ -43,6 +43,14 @@ add_executable(${TARGET}
         src/engine/core/game_app.h
         src/engine/core/time.cpp
         src/engine/core/time.h
+        src/engine/resource/audio_manager.cpp
+        src/engine/resource/audio_manager.h
+        src/engine/resource/resource_manager.cpp
+        src/engine/resource/resource_manager.h
+        src/engine/resource/texture_manager.cpp
+        src/engine/resource/texture_manager.h
+        src/engine/resource/font_manager.cpp
+        src/engine/resource/font_manager.h
 )
 
 # 链接库
