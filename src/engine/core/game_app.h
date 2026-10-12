@@ -15,6 +15,11 @@ namespace engine::resource {
 class ResourceManager;
 }
 
+namespace engine::render {
+class Camera;
+class Renderer;
+}
+
 namespace engine::core {
 class Time;
 
@@ -36,17 +41,26 @@ private:
     void render();
     void close();
 
-    bool initSDL();
-    bool initTime();
-    bool initResourceManager();
+    [[nodiscard]] bool initSDL();
+    [[nodiscard]] bool initTime();
+    [[nodiscard]] bool initResourceManager();
+    [[nodiscard]] bool initRenderer();
+    [[nodiscard]] bool initCamera();
 
+    // 测试
     void testResourceManager();
+    void testRenderer();
+    void testCamera();
+
 private:
     SDL_Window* window_{nullptr};
     SDL_Renderer* sdl_renderer_{nullptr};
     bool is_running_{false};
+
     std::unique_ptr<engine::core::Time> time_;
     std::unique_ptr<engine::resource::ResourceManager> resource_manager_;
+    std::unique_ptr<engine::render::Camera> camera_;
+    std::unique_ptr<engine::render::Renderer> renderer_;
 };
 }
 

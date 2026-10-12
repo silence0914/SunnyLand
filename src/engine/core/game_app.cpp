@@ -2,11 +2,15 @@
 // Created by wangm on 26-10-8.
 //
 
-#include "game_app.h"
-#include "time.h"
+
 #include <SDL3/SDL.h>
 #include <spdlog/spdlog.h>
 
+#include "time.h"
+#include "game_app.h"
+
+#include "../render/camera.h"
+#include "../render/renderer.h"
 #include "../resource/resource_manager.h"
 #include "../resource/audio_manager.h"
 #include "../resource/texture_manager.h"
@@ -42,6 +46,9 @@ GameApp::~GameApp() {
 bool GameApp::init() {
     if (!initSDL()) { return false; }
     if (!initResourceManager()) { return false; }
+    if (!initCamera()) { return false; }
+    if (!initRenderer()) { return false; }
+
     if (!initTime()) { return false; }
     is_running_ = true;
     return true;
@@ -54,12 +61,21 @@ void GameApp::handleEvents() {
             is_running_ = false;
         }
     }
+    // 测试
+    testCamera();
 }
 
-void GameApp::update(const std::chrono::milliseconds& dt) {
-}
+void GameApp::update(const std::chrono::milliseconds& dt) {}
 
 void GameApp::render() {
+    // 清空屏幕
+    renderer_->clearScreen();
+
+    // 测试
+    testRenderer();
+
+    // 更新屏幕显示；
+    renderer_->present();
 }
 
 void GameApp::close() {
@@ -118,6 +134,26 @@ bool GameApp::initResourceManager() {
     return true;
 }
 
+bool GameApp::initRenderer() {
+    try {
+        renderer_ = std::make_unique<engine::render::Renderer>(sdl_renderer_, resource_manager_.get());
+    } catch (const std::exception& e) {
+        spdlog::error("initRenderer failed;error : {}", e.what());
+        return false;
+    }
+    return true;
+}
+
+bool GameApp::initCamera() {
+    try {
+        camera_ = std::make_unique<engine::render::Camera>(glm::vec2(1280, 720));
+    } catch (const std::exception& e) {
+        spdlog::error("initCamera failed;error : {}", e.what());
+        return false;
+    }
+    return true;
+}
+
 void GameApp::testResourceManager() {
     resource_manager_->getFont("assets/fonts/VonwaonBitmap-16px.ttf", 16);
     resource_manager_->getTexture("assets/textures/Actors/eagle-attack.png");
@@ -126,5 +162,34 @@ void GameApp::testResourceManager() {
     resource_manager_->unloadFont("assets/fonts/VonwaonBitmap-16px.ttf", 16);
     resource_manager_->unloadTexture("assets/textures/Actors/eagle-attack.png");
     resource_manager_->unloadSound("assets/audio/button_click.wav");
+}
+
+void GameApp::testRenderer() {
+    engine::render::Sprite sprite_frog("assets/textures/Actors/frog.png");
+    engine::render::Sprite sprite_back("assets/textures/Layers/back.png");
+    engine::render::Sprite sprite_helps("assets/textures/UI/buttons/Helps1.png");
+
+    static float rotation = 0.0f;
+    rotation += 0.1f;
+
+    renderer_->drawParallax(*camera_, sprite_back, glm::vec2{100, 100}, glm::vec2{0.5, 0.5}, glm::bvec2{true, false});
+    renderer_->drawSprite(*camera_, sprite_frog, glm::vec2{200, 100}, glm::vec2{1.0f, 1.0f}, rotation);
+    renderer_->drawUISprite(sprite_helps, glm::vec2{300, 300});
+}
+
+void GameApp::testCamera() {
+    auto key_state = SDL_GetKeyboardState(nullptr);
+    if (key_state[SDL_SCANCODE_UP]) {
+        camera_->move(glm::vec2{0, -1});
+    }
+    if (key_state[SDL_SCANCODE_DOWN]) {
+        camera_->move(glm::vec2{0, 1});
+    }
+    if (key_state[SDL_SCANCODE_LEFT]) {
+        camera_->move(glm::vec2{-1, 0});
+    }
+    if (key_state[SDL_SCANCODE_RIGHT]) {
+        camera_->move(glm::vec2{1, 0});
+    }
 }
 }

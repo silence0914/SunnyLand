@@ -51,6 +51,12 @@ add_executable(${TARGET}
         src/engine/resource/texture_manager.h
         src/engine/resource/font_manager.cpp
         src/engine/resource/font_manager.h
+        src/engine/utils/math.h
+        src/engine/render/Renderer.cpp
+        src/engine/render/Renderer.h
+        src/engine/render/camera.cpp
+        src/engine/render/Camera.h
+        src/engine/render/sprite.h
 )
 
 # 链接库

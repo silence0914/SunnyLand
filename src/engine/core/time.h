@@ -8,9 +8,9 @@
 #include <chrono>
 
 namespace engine::core {
-class Time final {
-    using duration_unit = std::chrono::milliseconds;
+using duration_unit = std::chrono::milliseconds;
 
+class Time final {
 public:
     Time(int target_fps = 0);
     ~Time() = default;
