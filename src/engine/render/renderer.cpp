@@ -97,7 +97,7 @@ void Renderer::drawParallax(const engine::render::Camera& camera, const Sprite& 
         stop.x = viewport_size.x;
     } else {
         start.x = position_screen.x;
-        stop.x = glm::min(position.x + scaled_tex_w, viewport_size.x);
+        stop.x = glm::min(position_screen.x + scaled_tex_w, viewport_size.x);
     }
 
     if (repeat.y) {
@@ -105,7 +105,7 @@ void Renderer::drawParallax(const engine::render::Camera& camera, const Sprite& 
         stop.y = viewport_size.y;
     } else {
         start.y = position_screen.y;
-        stop.y = glm::min(position.y + scaled_tex_h, viewport_size.y);
+        stop.y = glm::min(position_screen.y + scaled_tex_h, viewport_size.y);
     }
 
     for (float y = start.y; y < stop.y; y += scaled_tex_h) {

@@ -10,15 +10,12 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # 设置编译选项
-# 设置编译选项
 if (MSVC)
     # 使用动态运行时库 (/MD 和 /MDd) 以匹配 spdlog 等第三方库
     add_compile_options(/W4)
 else()
     add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
-
-
 
 
 # 设置编译输出目录
@@ -57,6 +54,8 @@ add_executable(${TARGET}
         src/engine/render/camera.cpp
         src/engine/render/Camera.h
         src/engine/render/sprite.h
+        src/engine/core/Config.cpp
+        src/engine/core/Config.h
 )
 
 # 链接库

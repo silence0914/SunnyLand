@@ -9,6 +9,7 @@
 #include "time.h"
 #include "game_app.h"
 
+#include "config.h"
 #include "../render/camera.h"
 #include "../render/renderer.h"
 #include "../resource/resource_manager.h"
@@ -44,6 +45,7 @@ GameApp::~GameApp() {
 }
 
 bool GameApp::init() {
+    if (!initConfig()) { return false; }
     if (!initSDL()) { return false; }
     if (!initResourceManager()) { return false; }
     if (!initCamera()) { return false; }
@@ -80,6 +82,10 @@ void GameApp::render() {
 
 void GameApp::close() {
     spdlog::trace("game app close");
+
+    // 先释放Audio 后释放 windows; 否则音频退出会出错；
+    resource_manager_.reset();
+
     if (sdl_renderer_ != nullptr) {
         SDL_DestroyRenderer(sdl_renderer_);
         sdl_renderer_ = nullptr;
@@ -98,7 +104,8 @@ bool GameApp::initSDL() {
         spdlog::error("SDL_Init failed");
         return false;
     }
-    window_ = SDL_CreateWindow("SunnyLand", 1280, 720,SDL_WINDOW_RESIZABLE);
+    window_ = SDL_CreateWindow(config_->window_title_.c_str(), config_->window_width_, config_->window_height_,
+                               SDL_WINDOW_RESIZABLE);
     if (window_ == nullptr) {
         spdlog::error("create window failed, error : {}", SDL_GetError());
         return false;
@@ -108,13 +115,20 @@ bool GameApp::initSDL() {
         spdlog::error("create render failed, error : {}", SDL_GetError());
         return false;
     }
+
+    int vsync_mode = config_->vsync_enabled_ ? SDL_RENDERER_VSYNC_ADAPTIVE : SDL_RENDERER_VSYNC_DISABLED;
+    SDL_SetRenderVSync(sdl_renderer_, vsync_mode);
+
+    SDL_SetRenderLogicalPresentation(sdl_renderer_, config_->window_width_ / 2, config_->window_height_ / 2,
+                                     SDL_LOGICAL_PRESENTATION_LETTERBOX);
+
     spdlog::trace("initSDL success;");
     return true;
 }
 
 bool GameApp::initTime() {
     try {
-        time_ = std::make_unique<Time>(60);
+        time_ = std::make_unique<Time>(config_->target_fps_);
     } catch (const std::exception& e) {
         spdlog::error("initTime failed; error : {}", e.what());
         return false;
@@ -146,9 +160,20 @@ bool GameApp::initRenderer() {
 
 bool GameApp::initCamera() {
     try {
-        camera_ = std::make_unique<engine::render::Camera>(glm::vec2(1280, 720));
+        camera_ = std::make_unique<engine::render::Camera>(
+            glm::vec2(config_->window_width_ / 2, config_->window_height_ / 2));
     } catch (const std::exception& e) {
         spdlog::error("initCamera failed;error : {}", e.what());
+        return false;
+    }
+    return true;
+}
+
+bool GameApp::initConfig() {
+    try {
+        config_ = std::make_unique<engine::core::Config>("assets/config.json");
+    } catch (const std::exception& e) {
+        spdlog::error("initConfig failed; error : {}", e.what());
         return false;
     }
     return true;
