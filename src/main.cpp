@@ -1,7 +1,6 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 #include "engine/core/game_app.h"
-
 int main() {
     spdlog::set_level(spdlog::level::trace);
 

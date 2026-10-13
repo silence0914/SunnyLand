@@ -1,6 +1,7 @@
 # 标题
 cmake_minimum_required(VERSION 3.10.0)
 
+
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 project(SunnyLand VERSION 0.1.0 LANGUAGES C CXX)
@@ -12,10 +13,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # 设置编译选项
 if (MSVC)
     # 使用动态运行时库 (/MD 和 /MDd) 以匹配 spdlog 等第三方库
+    add_compile_options(/utf-8)
     add_compile_options(/W4)
-else()
+else ()
     add_compile_options(-Wall -Wextra -Wpedantic)
-endif()
+endif ()
 
 
 # 设置编译输出目录
@@ -56,6 +58,8 @@ add_executable(${TARGET}
         src/engine/render/sprite.h
         src/engine/core/Config.cpp
         src/engine/core/Config.h
+        src/engine/input/input_manager.cpp
+        src/engine/input/input_manager.h
 )
 
 # 链接库

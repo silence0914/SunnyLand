@@ -16,6 +16,7 @@
 #include "../resource/audio_manager.h"
 #include "../resource/texture_manager.h"
 #include "../resource/font_manager.h"
+#include "../input/input_manager.h"
 
 namespace engine::core {
 GameApp::GameApp() = default;
@@ -30,6 +31,7 @@ void GameApp::Run() {
 
     while (is_running_) {
         time_->update();
+        input_manager_->update();
         handleEvents();
         update(time_->getDeltaTime());
         render();
@@ -50,6 +52,7 @@ bool GameApp::init() {
     if (!initResourceManager()) { return false; }
     if (!initCamera()) { return false; }
     if (!initRenderer()) { return false; }
+    if (!initInputManager()) { return false; }
 
     if (!initTime()) { return false; }
     is_running_ = true;
@@ -57,17 +60,16 @@ bool GameApp::init() {
 }
 
 void GameApp::handleEvents() {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_EVENT_QUIT) {
-            is_running_ = false;
-        }
+    if (input_manager_->shouldQuit()) {
+        is_running_ = false;
+        return;
     }
-    // 测试
-    testCamera();
+    testInputManager();
 }
 
-void GameApp::update(const std::chrono::milliseconds& dt) {}
+void GameApp::update(const std::chrono::milliseconds& dt) {
+    testCamera();
+}
 
 void GameApp::render() {
     // 清空屏幕
@@ -179,6 +181,16 @@ bool GameApp::initConfig() {
     return true;
 }
 
+bool GameApp::initInputManager() {
+    try {
+        input_manager_ = std::make_unique<engine::input::InputManager>(sdl_renderer_, config_.get());
+    } catch (const std::exception& e) {
+        spdlog::error("initInputManager failed; error : {}", e.what());
+        return false;
+    }
+    return true;
+}
+
 void GameApp::testResourceManager() {
     resource_manager_->getFont("assets/fonts/VonwaonBitmap-16px.ttf", 16);
     resource_manager_->getTexture("assets/textures/Actors/eagle-attack.png");
@@ -215,6 +227,32 @@ void GameApp::testCamera() {
     }
     if (key_state[SDL_SCANCODE_RIGHT]) {
         camera_->move(glm::vec2{1, 0});
+    }
+}
+
+void GameApp::testInputManager() {
+    std::vector<std::string> actions = {
+        "move_up",
+        "move_down",
+        "move_left",
+        "move_right",
+        "jump",
+        "attack",
+        "pause",
+        "MouseLeftClick",
+        "MouseRightClick"
+    };
+
+    for (const auto& action: actions) {
+        if (input_manager_->isActionPressed(action)) {
+            spdlog::info(" {} 按下 ", action);
+        }
+        if (input_manager_->isActionReleased(action)) {
+            spdlog::info(" {} 抬起 ", action);
+        }
+        if (input_manager_->isActionDown(action)) {
+            spdlog::info(" {} 按下中 ", action);
+        }
     }
 }
 }

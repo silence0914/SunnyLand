@@ -20,6 +20,10 @@ class Camera;
 class Renderer;
 }
 
+namespace engine::input {
+class InputManager;
+}
+
 namespace engine::core {
 class Time;
 class Config;
@@ -48,11 +52,13 @@ private:
     [[nodiscard]] bool initRenderer();
     [[nodiscard]] bool initCamera();
     [[nodiscard]] bool initConfig();
+    [[nodiscard]] bool initInputManager();
 
     // 测试
     void testResourceManager();
     void testRenderer();
     void testCamera();
+    void testInputManager();
 
 private:
     SDL_Window* window_{nullptr};
@@ -64,6 +70,7 @@ private:
     std::unique_ptr<engine::render::Camera> camera_;
     std::unique_ptr<engine::render::Renderer> renderer_;
     std::unique_ptr<engine::core::Config> config_;
+    std::unique_ptr<engine::input::InputManager> input_manager_;
 };
 }
 
