@@ -17,6 +17,7 @@
 #include "../resource/texture_manager.h"
 #include "../resource/font_manager.h"
 #include "../input/input_manager.h"
+#include "../object/game_object.h"
 
 namespace engine::core {
 GameApp::GameApp() = default;
@@ -254,5 +255,10 @@ void GameApp::testInputManager() {
             spdlog::info(" {} 按下中 ", action);
         }
     }
+}
+
+void GameApp::testGameObject() {
+    engine::object::GameObject game_object("test_game_object");
+    game_object.addComponent<engine::component::Component>();
 }
 }

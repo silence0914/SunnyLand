@@ -24,6 +24,10 @@ namespace engine::input {
 class InputManager;
 }
 
+namespace engine::object {
+class GameObject;
+}
+
 namespace engine::core {
 class Time;
 class Config;
@@ -59,6 +63,7 @@ private:
     void testRenderer();
     void testCamera();
     void testInputManager();
+    void testGameObject();
 
 private:
     SDL_Window* window_{nullptr};

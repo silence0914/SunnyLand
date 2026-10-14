@@ -60,6 +60,9 @@ add_executable(${TARGET}
         src/engine/core/Config.h
         src/engine/input/input_manager.cpp
         src/engine/input/input_manager.h
+        src/engine/component/component.h
+        src/engine/object/game_object.cpp
+        src/engine/object/game_object.h
 )
 
 # 链接库
