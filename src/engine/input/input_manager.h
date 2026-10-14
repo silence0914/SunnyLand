@@ -10,6 +10,7 @@
 #include <string>
 #include <glm/glm.hpp>
 #include <SDL3/SDL_render.h>
+#include <variant>
 struct SDL_Renderer;
 
 namespace engine::core {
@@ -18,6 +19,7 @@ class Config;
 
 namespace engine {
 namespace input {
+
 enum class ActionState {
     INACTIVE, // 未激活
     PRESSED_THIS_FRAME, // 按键按下
@@ -25,6 +27,11 @@ enum class ActionState {
     RELEASED_THIS_FRAME // 按键抬起
 };
 
+/**
+ * @brief 输入管理类
+ *
+ * 处理鼠标键盘输入事件；
+ */
 class InputManager final {
 public:
     InputManager(SDL_Renderer* renderer, const engine::core::Config* config);
@@ -44,10 +51,9 @@ private:
     SDL_Renderer* sdl_renderer_{nullptr};
     // 动作 -》 按键名称
     std::unordered_map<std::string, std::vector<std::string> > actions_to_keyname_map_;
-    // 键盘按键  关联动作
-    std::unordered_map<SDL_Scancode, std::vector<std::string> > scancode_to_actions_map;
-    // 鼠标按键  关联动作
-    std::unordered_map<Uint8, std::vector<std::string> > mouse_button_to_actions_map;
+
+    // 按键 -》 动作
+    std::unordered_map<std::variant<SDL_Scancode, Uint32>, std::vector<std::string> > input_to_actions_map_;
 
     // 储存动作状态；
     std::unordered_map<std::string, ActionState> action_states_;
@@ -61,7 +67,7 @@ private:
 
     void updateActionState(const std::string& action_name, bool is_input_active, bool is_repeat_event); // 更新动作状态；
     SDL_Scancode scancodeFromString(const std::string& key_name); // 将字符串转换成 SDL_Scancode;
-    Uint8 mouseButtonUint8FromString(const std::string& button_name); // 将字符串按键命转换为SDL_Button;
+    Uint32 mouseButtonFromString(const std::string& button_name); // 将字符串按键命转换为SDL_Button;
 };
 } // input
 } // engine

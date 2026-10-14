@@ -17,15 +17,20 @@ InputManager::InputManager(SDL_Renderer* renderer, const engine::core::Config* c
         spdlog::error("create InputManager failed; sdl_renderer = nullptr");
         throw std::runtime_error("create InputManager failed,sdl = nullptr");
     }
+    // 初始化映射表；
     initializeMappings(config);
-    float x, y;
-    SDL_GetMouseState(&x, &y);
-    mouse_position_ = {x, y};
+
+    // 初始化鼠标坐标；
+    SDL_GetMouseState(&mouse_position_.x, &mouse_position_.y);
     spdlog::trace("create InputManager completion");
 }
 
 void InputManager::update() {
+    // 根据上一帧的状态，更新默认的动作状态；
     for (auto& [action,state]: action_states_) {
+        if (state == ActionState::INACTIVE) {
+            break;
+        }
         if (state == ActionState::PRESSED_THIS_FRAME) {
             state = ActionState::HELD_DOWN;
             break;
@@ -35,6 +40,7 @@ void InputManager::update() {
         }
     }
 
+    // 处理所有待处理的 SDL 事件；
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         processEvent(event);
@@ -96,8 +102,8 @@ void InputManager::processEvent(const SDL_Event& event) {
             bool is_down = event.key.down;
             bool is_repeat = event.key.repeat;
 
-            auto it = scancode_to_actions_map.find(scancode);
-            if (it == scancode_to_actions_map.end()) {
+            auto it = input_to_actions_map_.find(scancode);
+            if (it == input_to_actions_map_.end()) {
                 return;
             }
             const std::vector<std::string>& associated_actions = it->second;
@@ -108,10 +114,10 @@ void InputManager::processEvent(const SDL_Event& event) {
         }
         case SDL_EVENT_MOUSE_BUTTON_DOWN:
         case SDL_EVENT_MOUSE_BUTTON_UP: {
-            Uint8 button = event.button.button;
+            Uint32 button = event.button.button;
             bool is_down = event.button.down;
-            auto it = mouse_button_to_actions_map.find(button);
-            if (it == mouse_button_to_actions_map.end()) {
+            auto it = input_to_actions_map_.find(button);
+            if (it == input_to_actions_map_.end()) {
                 return;
             }
             const std::vector<std::string>& associated_actions = it->second;
@@ -140,8 +146,7 @@ void InputManager::initializeMappings(const engine::core::Config* config) {
         throw std::runtime_error{"initializeMappings failed;config = nullptr"};
     }
     actions_to_keyname_map_ = config->input_mappings_;
-    scancode_to_actions_map.clear();
-    mouse_button_to_actions_map.clear();
+    input_to_actions_map_.clear();
     action_states_.clear();
 
     if (actions_to_keyname_map_.find("MouseLeftClick") == actions_to_keyname_map_.end()) {
@@ -155,13 +160,13 @@ void InputManager::initializeMappings(const engine::core::Config* config) {
         action_states_[action_name] = ActionState::INACTIVE;
         for (const std::string& key_name: key_names) {
             SDL_Scancode scancode = scancodeFromString(key_name);
-            Uint8 mouse_button = mouseButtonUint8FromString(key_name);
+            Uint32 mouse_button = mouseButtonFromString(key_name);
 
             if (scancode != SDL_SCANCODE_UNKNOWN) {
-                scancode_to_actions_map[scancode].push_back(action_name);
+                input_to_actions_map_[scancode].push_back(action_name);
                 spdlog::trace("scancode_to_actions_map; key mapping; {} : {}", static_cast<int>(scancode), action_name);
             } else if (mouse_button != 0) {
-                mouse_button_to_actions_map[mouse_button].push_back(action_name);
+                input_to_actions_map_[mouse_button].push_back(action_name);
                 spdlog::trace("mouse_button_to_actions_map; key mapping; {} : {}", mouse_button, action_name);
             } else {
                 spdlog::warn("key mapping failed;{} : {}", key_name, action_name);
@@ -192,7 +197,7 @@ SDL_Scancode InputManager::scancodeFromString(const std::string& key_name) {
     return SDL_GetScancodeFromName(key_name.c_str());
 }
 
-Uint8 InputManager::mouseButtonUint8FromString(const std::string& button_name) {
+Uint32 InputManager::mouseButtonFromString(const std::string& button_name) {
     if (button_name == "MouseLeft") return SDL_BUTTON_LEFT;
     if (button_name == "MouseMiddle") return SDL_BUTTON_MIDDLE;
     if (button_name == "MouseRight") return SDL_BUTTON_RIGHT;
