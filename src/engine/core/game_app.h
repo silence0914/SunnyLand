@@ -31,6 +31,7 @@ class GameObject;
 namespace engine::core {
 class Time;
 class Config;
+class Context;
 
 class GameApp final {
 public:
@@ -57,6 +58,8 @@ private:
     [[nodiscard]] bool initCamera();
     [[nodiscard]] bool initConfig();
     [[nodiscard]] bool initInputManager();
+    [[nodiscard]] bool initContext();
+
 
     // 测试
     void testResourceManager();
@@ -70,12 +73,13 @@ private:
     SDL_Renderer* sdl_renderer_{nullptr};
     bool is_running_{false};
 
-    std::unique_ptr<engine::core::Time> time_;
-    std::unique_ptr<engine::resource::ResourceManager> resource_manager_;
-    std::unique_ptr<engine::render::Camera> camera_;
-    std::unique_ptr<engine::render::Renderer> renderer_;
-    std::unique_ptr<engine::core::Config> config_;
-    std::unique_ptr<engine::input::InputManager> input_manager_;
+    std::unique_ptr<engine::core::Time> time_;                            // 时间管理
+    std::unique_ptr<engine::resource::ResourceManager> resource_manager_; // 资源管理
+    std::unique_ptr<engine::render::Camera> camera_;                      // 摄像头
+    std::unique_ptr<engine::render::Renderer> renderer_;                  // 渲染
+    std::unique_ptr<engine::core::Config> config_;                        // 配置
+    std::unique_ptr<engine::input::InputManager> input_manager_;          // 输入管理
+    std::unique_ptr<engine::core::Context> context_;                      // 上下文
 };
 }
 

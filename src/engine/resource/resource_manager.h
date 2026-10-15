@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <string>
+#include <glm/glm.hpp>
 struct TTF_Font;
 struct SDL_Texture;
 struct Mix_Chunk;
@@ -37,6 +38,7 @@ public:
     SDL_Texture* getTexture(const std::string& file_path); // 获取纹理
     void unloadTexture(const std::string& file_path); // 卸载纹理
     void clearTextures(); //清空纹理
+    glm::vec2 getTextureSize(const std::string& file_path);
 
 
     Mix_Chunk* loadSound(const std::string& file_path); // 加载音效

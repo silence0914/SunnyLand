@@ -10,6 +10,8 @@
 #include "game_app.h"
 
 #include "config.h"
+#include "context.h"
+#include "../component/sprite_component.h"
 #include "../render/camera.h"
 #include "../render/renderer.h"
 #include "../resource/resource_manager.h"
@@ -18,6 +20,7 @@
 #include "../resource/font_manager.h"
 #include "../input/input_manager.h"
 #include "../object/game_object.h"
+#include "../component/transform_component.h"
 
 namespace engine::core {
 GameApp::GameApp() = default;
@@ -54,9 +57,12 @@ bool GameApp::init() {
     if (!initCamera()) { return false; }
     if (!initRenderer()) { return false; }
     if (!initInputManager()) { return false; }
+    if (!initContext()) { return false; }
 
     if (!initTime()) { return false; }
     is_running_ = true;
+    spdlog::info("gameApp init completion");
+    testGameObject();
     return true;
 }
 
@@ -78,6 +84,7 @@ void GameApp::render() {
 
     // 测试
     testRenderer();
+
 
     // 更新屏幕显示；
     renderer_->present();
@@ -164,7 +171,8 @@ bool GameApp::initRenderer() {
 bool GameApp::initCamera() {
     try {
         camera_ = std::make_unique<engine::render::Camera>(
-            glm::vec2(config_->window_width_ / 2, config_->window_height_ / 2));
+                                                           glm::vec2(config_->window_width_ / 2,
+                                                                     config_->window_height_ / 2));
     } catch (const std::exception& e) {
         spdlog::error("initCamera failed;error : {}", e.what());
         return false;
@@ -192,6 +200,18 @@ bool GameApp::initInputManager() {
     return true;
 }
 
+bool GameApp::initContext() {
+    try {
+        context_ = std::make_unique<engine::core::Context>(*camera_, *renderer_, *input_manager_, *resource_manager_);
+    } catch (const std::exception& e) {
+        spdlog::error("initContext failed; error : {}", e.what());
+        return false;
+    }
+    return true;
+}
+
+// -----------------  test -------------------- //
+
 void GameApp::testResourceManager() {
     resource_manager_->getFont("assets/fonts/VonwaonBitmap-16px.ttf", 16);
     resource_manager_->getTexture("assets/textures/Actors/eagle-attack.png");
@@ -201,6 +221,9 @@ void GameApp::testResourceManager() {
     resource_manager_->unloadTexture("assets/textures/Actors/eagle-attack.png");
     resource_manager_->unloadSound("assets/audio/button_click.wav");
 }
+
+static engine::object::GameObject game_object1("test_game_object");
+static engine::object::GameObject game_object2("test_game_object");
 
 void GameApp::testRenderer() {
     engine::render::Sprite sprite_frog("assets/textures/Actors/frog.png");
@@ -213,6 +236,9 @@ void GameApp::testRenderer() {
     renderer_->drawParallax(*camera_, sprite_back, glm::vec2{100, 100}, glm::vec2{0.5, 0.5}, glm::bvec2{true, false});
     renderer_->drawSprite(*camera_, sprite_frog, glm::vec2{200, 100}, glm::vec2{1.0f, 1.0f}, rotation);
     renderer_->drawUISprite(sprite_helps, glm::vec2{300, 300});
+
+    game_object1.render(*context_);
+    game_object2.render(*context_);
 }
 
 void GameApp::testCamera() {
@@ -258,7 +284,18 @@ void GameApp::testInputManager() {
 }
 
 void GameApp::testGameObject() {
-    engine::object::GameObject game_object("test_game_object");
-    game_object.addComponent<engine::component::Component>();
+    game_object1.addComponent<engine::component::TransformComponent>(glm::vec2{100, 100});
+    game_object1.addComponent<engine::component::SpriteComponent>("assets/textures/Props/big-crate.png",
+                                                                  resource_manager_.get(),
+                                                                  engine::utils::Alignment::CENTER);
+    game_object1.getComponent<engine::component::TransformComponent>()->setRotation(30.0f);
+    game_object1.getComponent<engine::component::TransformComponent>()->setScale({2.0, 2.0});
+
+    // game_object1.getComponent<engine::component::TransformComponent>()->setRotation(30.0f);
+
+    game_object2.addComponent<engine::component::TransformComponent>(glm::vec2{400, 100});
+    game_object2.addComponent<engine::component::SpriteComponent>("assets/textures/Props/big-crate.png",
+                                                                  resource_manager_.get(),
+                                                                  engine::utils::Alignment::CENTER);
 }
 }

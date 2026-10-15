@@ -11,6 +11,10 @@ namespace engine::object {
 class GameObject;
 }
 
+namespace engine::core {
+class Context;
+}
+
 namespace engine::component {
 /**
  * @brief 组件抽象基类
@@ -38,9 +42,9 @@ protected:
 
 protected:
     virtual void init() {} //初始化
-    virtual void handleInput() {} // 输入处理
-    virtual void update(const std::chrono::milliseconds&) {} // 更新
-    virtual void render() {} // 渲染
+    virtual void handleInput(engine::core::Context& context) {} // 输入处理
+    virtual void update(const std::chrono::milliseconds& ,engine::core::Context&) {} // 更新
+    virtual void render(engine::core::Context& context) {} // 渲染
     virtual void clear() {} // 清理
 };
 } // component

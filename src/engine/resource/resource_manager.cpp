@@ -52,6 +52,11 @@ void ResourceManager::clearTextures() {
     texture_manager_->clearTextures();
 }
 
+glm::vec2 ResourceManager::getTextureSize(const std::string& file_path) {
+    return texture_manager_->getTextureSize(file_path);
+}
+
+
 Mix_Chunk* ResourceManager::loadSound(const std::string& file_path) {
     return audio_manager_->loadSound(file_path);
 }

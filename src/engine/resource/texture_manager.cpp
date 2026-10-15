@@ -55,6 +55,21 @@ void TextureManager::unloadTexture(const std::string& file_path) {
     spdlog::debug("unload texture success; {}", file_path);
 }
 
+glm::vec2 TextureManager::getTextureSize(const std::string& file_path) {
+    auto texture = getTexture(file_path);
+    if (texture == nullptr) {
+        spdlog::error("getTextureSize failed; texture = nullptr, file_path = '{}'", file_path);
+    }
+
+    glm::vec2 result{};
+    if (!SDL_GetTextureSize(texture, &result.x, &result.y)) {
+        spdlog::error("getTextureSize failed;SDL_GetTextureSize failed;filepath = {} ,SDL_error = {}", file_path,
+                      SDL_GetError());
+        return glm::vec2{0.0f, 0.0f};
+    }
+    return result;
+}
+
 void TextureManager::clearTextures() {
     spdlog::trace("clear texture");
     if (!texture_.empty()) {

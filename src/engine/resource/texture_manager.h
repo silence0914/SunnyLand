@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <memory>
 #include <string>
+#include <glm/vec2.hpp>
 #include <SDL3/SDL_render.h>
 
 namespace engine::resource {
@@ -27,6 +28,7 @@ private:
     SDL_Texture* loadTexture(const std::string& file_path); // 加载纹理
     SDL_Texture* getTexture(const std::string& file_path); // 获取纹理
     void unloadTexture(const std::string& file_path); // 卸载纹理
+    glm::vec2 getTextureSize(const std::string& file_path); // 获取纹理尺寸；
     void clearTextures(); //清空纹理
 
 private:

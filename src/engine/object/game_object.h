@@ -11,6 +11,10 @@
 #include <typeindex>
 #include <spdlog/spdlog.h>
 
+namespace engine::core {
+class Context;
+}
+
 namespace engine::object {
 template<typename T>
 concept derived_component = std::derived_from<T, engine::component::Component>; // 约束模板参数T 必须继承自Component;
@@ -79,11 +83,11 @@ public:
     template<typename T>
         requires derived_component<T>
     T* getComponent() const {
-        auto it = components_.find(typeid(T));
+        auto it = components_.find(std::type_index(typeid(T)));
         if (it == components_.end()) {
             return nullptr;
         }
-        return it->second.get();
+        return static_cast<T*>(it->second.get());
     }
 
     /**
@@ -103,18 +107,17 @@ public:
         components_.erase(it);
     }
 
-private:
-    std::string name_; // 名称
-    std::string tag_; // 标签
-    std::unordered_map<std::type_index, std::unique_ptr<engine::component::Component> > components_; // 组件表
-    bool need_remove_{false}; // 延迟删除标识；
-
     // 循环组件；
-    void handleInput(); // 处理输入
-    void update(const std::chrono::milliseconds& dt); // 更新所有组件
-    void render(); // 渲染所有组件
+    void handleInput(engine::core::Context& context);                                 // 处理输入
+    void update(const std::chrono::milliseconds& dt, engine::core::Context& context); // 更新所有组件
+    void render(engine::core::Context& context);                                      // 渲染所有组件
 
     void clear(); // 清理组件
+private:
+    std::string name_;                                                                               // 名称
+    std::string tag_;                                                                                // 标签
+    std::unordered_map<std::type_index, std::unique_ptr<engine::component::Component> > components_; // 组件表
+    bool need_remove_{false};                                                                        // 延迟删除标识；
 };
 } // object
 // engine

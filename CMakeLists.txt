@@ -63,6 +63,17 @@ add_executable(${TARGET}
         src/engine/component/component.h
         src/engine/object/game_object.cpp
         src/engine/object/game_object.h
+        src/engine/scene/scene.cpp
+        src/engine/scene/scene.h
+        src/engine/scene/scene_manager.cpp
+        src/engine/scene/scene_manager.h
+        src/engine/core/context.cpp
+        src/engine/core/context.h
+        src/engine/component/sprite_component.cpp
+        src/engine/component/sprite_component.h
+        src/engine/utils/alignment.h
+        src/engine/component/transform_component.cpp
+        src/engine/component/transform_component.h
 )
 
 # 链接库

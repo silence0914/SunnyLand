@@ -11,24 +11,24 @@ GameObject::GameObject(std::string name, std::string tag)
     spdlog::trace("create GameObject '{}' '{}' completion", name_, tag_);
 }
 
-void GameObject::handleInput() {
+void GameObject::handleInput(engine::core::Context& context) {
     // 遍历处理所有组件输入
     for (const auto& component: components_) {
-        component.second->handleInput();
+        component.second->handleInput(context);
     }
 }
 
-void GameObject::update(const std::chrono::milliseconds& dt) {
+void GameObject::update(const std::chrono::milliseconds& dt, engine::core::Context& context) {
     // 遍历更新全部组件
     for (const auto& component: components_) {
-        component.second->update(dt);
+        component.second->update(dt, context);
     }
 }
 
-void GameObject::render() {
+void GameObject::render(engine::core::Context& context) {
     // 遍历渲染全部组件；
     for (const auto& component: components_) {
-        component.second->render();
+        component.second->render(context);
     }
 }
 
