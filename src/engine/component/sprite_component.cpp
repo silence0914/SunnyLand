@@ -69,7 +69,6 @@ void SpriteComponent::init() {
 }
 
 void SpriteComponent::render(engine::core::Context& context) {
-    spdlog::trace("SpriteComponent render");
     if (is_hidden_ || resource_manager_ == nullptr || transform_component_ == nullptr) {
         return;
     }
@@ -81,7 +80,6 @@ void SpriteComponent::render(engine::core::Context& context) {
 
     // 绘制精灵图
     context.getRenderer().drawSprite(context.getCamera(), sprite_, pos, scale, rotation);
-    spdlog::trace("SpriteComponent render success");
 }
 
 

@@ -28,6 +28,10 @@ namespace engine::object {
 class GameObject;
 }
 
+namespace engine::scene {
+class SceneManager;
+}
+
 namespace engine::core {
 class Time;
 class Config;
@@ -59,14 +63,7 @@ private:
     [[nodiscard]] bool initConfig();
     [[nodiscard]] bool initInputManager();
     [[nodiscard]] bool initContext();
-
-
-    // 测试
-    void testResourceManager();
-    void testRenderer();
-    void testCamera();
-    void testInputManager();
-    void testGameObject();
+    [[nodiscard]] bool initSceneManager();
 
 private:
     SDL_Window* window_{nullptr};
@@ -74,12 +71,13 @@ private:
     bool is_running_{false};
 
     std::unique_ptr<engine::core::Time> time_;                            // 时间管理
+    std::unique_ptr<engine::core::Config> config_;                        // 配置
+    std::unique_ptr<engine::core::Context> context_;                      // 上下文
     std::unique_ptr<engine::resource::ResourceManager> resource_manager_; // 资源管理
     std::unique_ptr<engine::render::Camera> camera_;                      // 摄像头
     std::unique_ptr<engine::render::Renderer> renderer_;                  // 渲染
-    std::unique_ptr<engine::core::Config> config_;                        // 配置
     std::unique_ptr<engine::input::InputManager> input_manager_;          // 输入管理
-    std::unique_ptr<engine::core::Context> context_;                      // 上下文
+    std::unique_ptr<engine::scene::SceneManager> scene_manager_;          // 场景管理
 };
 }
 

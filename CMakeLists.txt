@@ -74,6 +74,10 @@ add_executable(${TARGET}
         src/engine/utils/alignment.h
         src/engine/component/transform_component.cpp
         src/engine/component/transform_component.h
+        src/engine/log/my_log.h
+        src/engine/log/log_manager.h
+        src/game/scene/game_scene.cpp
+        src/game/scene/game_scene.h
 )
 
 # 链接库

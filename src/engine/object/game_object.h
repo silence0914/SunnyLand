@@ -39,6 +39,13 @@ public:
     [[nodiscard]] bool isNeedRemove() const { return need_remove_; }
     void setNeedRemove(bool need_remove) { need_remove_ = need_remove; }
 
+    // 循环组件；
+    void handleInput(engine::core::Context& context);                                 // 处理输入
+    void update(const std::chrono::milliseconds& dt, engine::core::Context& context); // 更新所有组件
+    void render(engine::core::Context& context);                                      // 渲染所有组件
+
+    void clear(); // 清理组件
+
     /**
      * @brief 添加组件
      * @tparam T 组件类型  -  必须继承自component；
@@ -107,12 +114,6 @@ public:
         components_.erase(it);
     }
 
-    // 循环组件；
-    void handleInput(engine::core::Context& context);                                 // 处理输入
-    void update(const std::chrono::milliseconds& dt, engine::core::Context& context); // 更新所有组件
-    void render(engine::core::Context& context);                                      // 渲染所有组件
-
-    void clear(); // 清理组件
 private:
     std::string name_;                                                                               // 名称
     std::string tag_;                                                                                // 标签
