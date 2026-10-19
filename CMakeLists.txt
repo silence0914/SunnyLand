@@ -78,6 +78,11 @@ add_executable(${TARGET}
         src/engine/log/log_manager.h
         src/game/scene/game_scene.cpp
         src/game/scene/game_scene.h
+        src/engine/component/parallax_component.cpp
+        src/engine/component/parallax_component.h
+        src/engine/scene/level_loader.cpp
+        src/engine/scene/level_loader.h
+        src/engine/utils/action.h
 )
 
 # 链接库

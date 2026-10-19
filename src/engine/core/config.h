@@ -9,6 +9,9 @@
 #include <unordered_map>
 #include <string>
 
+#include "../utils/action.h"
+
+
 namespace engine::core {
 class Config final {
 public:
@@ -29,13 +32,13 @@ public:
 
     // 按键 - 动作映射
     std::unordered_map<std::string, std::vector<std::string> > input_mappings_{
-        {"move_left", {"A", "Left"}},
-        {"move_right", {"D", "Right"}},
-        {"move_up", {"W", "Up"}},
-        {"move_down", {"S", "Down"}},
-        {"jump", {"J", "Space"}},
-        {"attack", {"K", "MouseLeft"}},
-        {"pause", {"P", "Escape"}},
+        {std::string(engine::utils::action::MOVE_LEFT), {"A", "Left"}},
+        {std::string(engine::utils::action::MOVE_RIGHT), {"D", "Right"}},
+        {std::string(engine::utils::action::MOVE_UP), {"W", "Up"}},
+        {std::string(engine::utils::action::MOVE_DOWN), {"S", "Down"}},
+        {std::string(engine::utils::action::JUMP), {"J", "Space"}},
+        {std::string(engine::utils::action::ATTACK), {"K", "MouseLeft"}},
+        {std::string(engine::utils::action::PAUSE), {"P", "Escape"}}
     };
 
     explicit Config(const std::string& filepath);
