@@ -28,6 +28,12 @@ SDL_Texture* TextureManager::loadTexture(const std::string& file_path) {
     }
     spdlog::trace("load texture; {}", file_path);
     SDL_Texture* raw_texture = IMG_LoadTexture(renderer_, file_path.c_str());
+
+    // 载入纹理时， 设置纹理缩放模式为临近插值；
+    if (!SDL_SetTextureScaleMode(raw_texture, SDL_SCALEMODE_NEAREST)) {
+        spdlog::warn("set texture scale mode failed; {}", SDL_GetError());
+    }
+
     if (raw_texture == nullptr) {
         spdlog::error("load texture failed; {} : {}", file_path, SDL_GetError());
         return nullptr;

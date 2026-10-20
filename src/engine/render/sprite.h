@@ -14,6 +14,7 @@
 namespace engine::render {
 class Sprite {
 public:
+    Sprite() = default;
     /**
      *
      * @param texture_id 纹理id
@@ -34,9 +35,9 @@ public:
     void setIsFlipped(bool is_flipped) { is_flipped_ = is_flipped; }
 
 private:
-    std::string texture_id_; // 纹理资源id；
+    std::string texture_id_;               // 纹理资源id；
     std::optional<SDL_FRect> source_rect_; // 要绘制的纹理区域
-    bool is_flipped_{false}; // 是否水平反转
+    bool is_flipped_{false};               // 是否水平反转
 };
 } // render
 // engine

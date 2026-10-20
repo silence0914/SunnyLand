@@ -83,6 +83,8 @@ add_executable(${TARGET}
         src/engine/scene/level_loader.cpp
         src/engine/scene/level_loader.h
         src/engine/utils/action.h
+        src/engine/component/tilelayer_component.cpp
+        src/engine/component/tilelayer_component.h
 )
 
 # 链接库
