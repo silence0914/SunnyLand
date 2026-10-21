@@ -32,6 +32,8 @@ private:
     void createTestObject();
     void testCamera();
     void testObject();
+    void testCollisionPairs();
+
     engine::object::GameObject* test_object_{nullptr};
 };
 } // scene

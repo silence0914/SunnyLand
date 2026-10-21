@@ -89,6 +89,13 @@ add_executable(${TARGET}
         src/engine/physics/physics_engine.h
         src/engine/component/physics_component.cpp
         src/engine/component/physics_component.h
+        src/engine/component/collider_component.cpp
+        src/engine/component/collider_component.h
+        src/engine/physics/collider.h
+        src/engine/physics/aabb_collider.h
+        src/engine/physics/circleCollider.h
+        src/engine/physics/collision.cpp
+        src/engine/physics/collision.h
 )
 
 # 链接库
