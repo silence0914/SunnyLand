@@ -17,6 +17,9 @@
 #include "../object/game_object.h"
 #include <memory>
 
+#include "../component/sprite_component.h"
+#include "../core/context.h"
+
 namespace engine {
 namespace scene {
 constexpr static std::string_view OFFSET_X{"offsetx"};
@@ -42,6 +45,11 @@ constexpr static std::string_view COLUMNS{"columns"};
 constexpr static std::string_view TILES{"tiles"};
 constexpr static std::string_view ID{"id"};
 constexpr static std::string_view DATA{"data"};
+constexpr static std::string_view OBJECTS{"objects"};
+constexpr static std::string_view GID{"gid"};
+constexpr static std::string_view X{"x"};
+constexpr static std::string_view Y{"y"};
+constexpr static std::string_view ROTATION{"rotation"};
 
 
 bool LevelLoader::loadLevel(const std::string& map_path, Scene& scene) {
@@ -156,17 +164,60 @@ void LevelLoader::loadTileLayer(const nlohmann::json& layer_json, Scene& scene) 
 }
 
 void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene) {
-    // TODO;
+    if (!layer_json.contains(OBJECTS) || !layer_json[OBJECTS].is_array()) {
+        mylog::MyLog{}.error("layer '{}' need 'object'", layer_json.value(NAME, NONE));
+        return;
+    }
+    const auto& objects = layer_json[OBJECTS];
+    for (const auto& object: objects) {
+        auto gid = object.value(GID, 0);
+        if (gid == 0) {
+            // gid 不存在 代表需要自行处理；
+            // TODO;
+            continue;
+        }
+        // 根据gid获取信息；
+        auto tile_info = getTileInfoByGid(gid);
+        if (tile_info.sprite.getTextureId().empty()) {
+            mylog::MyLog{}.error("gid = '{}' need texture_id",gid);
+            continue;
+        }
+        // 获取transform信息；
+        auto position = glm::vec2(object.value(X, 0.0f), object.value(Y, 0.0f));
+        auto dst_size = glm::vec2(object.value(WIDTH, 0.0f), object.value(HEIGHT, 0.0f));
+        position = glm::vec2(position.x, position.y - dst_size.y); // 对齐到左下角；
+
+        auto rotation = object.value(ROTATION, 0.0f);
+        auto src_size_opt = tile_info.sprite.getSourceRect();
+        if (!src_size_opt) {
+            mylog::MyLog{}.error("tile need sourceRect; gid = '{}'", gid);
+            continue;
+        }
+        auto src_size = glm::vec2(src_size_opt->w, src_size_opt->h);
+        auto scale = dst_size / src_size;
+
+        // 获取对象名称
+        const std::string& object_name = object.value(NAME, NONE);
+
+        // 创建游戏对象并添加组件；
+        auto game_object = std::make_unique<engine::object::GameObject>(object_name);
+        game_object->addComponent<engine::component::TransformComponent>(position, scale, rotation);
+        game_object->addComponent<engine::component::SpriteComponent>(std::move(tile_info.sprite),
+                                                                      scene.getContext().getResourceManager());
+        scene.addGameObject(std::move(game_object));
+        mylog::MyLog{}.info("load Object {} success", object_name);
+    }
 }
+
 
 engine::component::TileInfo LevelLoader::getTileInfoByGid(int gid) {
     if (gid == 0) { return engine::component::TileInfo(); }
-    auto tileset_it = tileset_data_.upper_bound(gid);
+    auto tileset_it = tileset_data_.upper_bound(gid); // 找到大于gid 的第一个元素
     if (tileset_it == tileset_data_.begin()) {
         mylog::MyLog{}.error("tileset_data_ is empty;gid = {}", gid);
         return engine::component::TileInfo();
     }
-    --tileset_it;
+    --tileset_it; // 前移一位，  这样就得到不大于gid的最后一个元素
     const auto& tileset = tileset_it->second;
     auto local_id = gid - tileset_it->first; // 计算局部id；
     const std::string file_path = tileset.value(FILE_PATH, "");
@@ -174,7 +225,9 @@ engine::component::TileInfo LevelLoader::getTileInfoByGid(int gid) {
         mylog::MyLog{}.error("tileset '{}' have no file_path;gid = {}", tileset.value(NAME, NONE), gid);
         return engine::component::TileInfo();
     }
+    // 图集分两种情况
     if (tileset.contains(IMAGE)) {
+        // 单图片情况
         auto texture_id = resolvePath(tileset[IMAGE].get<std::string>(), file_path);
         auto coordinate_x = local_id % tileset[COLUMNS].get<int>();
         auto coordinate_y = local_id / tileset[COLUMNS].get<int>();
@@ -187,6 +240,7 @@ engine::component::TileInfo LevelLoader::getTileInfoByGid(int gid) {
         engine::render::Sprite sprite{texture_id, texture_rect};
         return engine::component::TileInfo{sprite, engine::component::TileType::NORMAL};
     } else {
+        // 多图片情况
         if (!tileset.contains(TILES)) {
             mylog::MyLog{}.error("tileset '{}' have no tiles;gid = {}", tileset_it->first, gid);
             return engine::component::TileInfo();
@@ -194,7 +248,7 @@ engine::component::TileInfo LevelLoader::getTileInfoByGid(int gid) {
         const auto& tiles_json = tileset[TILES];
         for (const auto& tile_json: tiles_json) {
             auto tile_id = tile_json.value(ID, 0);
-            if (!tile_id == local_id) { continue; }
+            if (!(tile_id == local_id)) { continue; }
             if (!tile_json.contains(IMAGE)) {
                 mylog::MyLog{}.error("tile '{}' have no image;gid = {}", tileset_it->first, gid);
                 return engine::component::TileInfo();

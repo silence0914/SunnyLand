@@ -23,12 +23,32 @@ class SpriteComponent final : public engine::component::Component {
     friend class engine::object::GameObject;
 
 public:
+    /**
+     * @brief 构造函数
+     * @param texture_id  纹理id
+     * @param resource_manager 资源管理器指针
+     * @param alignment 初始对齐方式 可选
+     * @param source_rect 原矩形 可选
+     * @param is_flipped 初始翻转状态；
+     */
     SpriteComponent(const std::string& texture_id,
                     engine::resource::ResourceManager* resource_manager,
                     engine::utils::Alignment alignment = engine::utils::Alignment::NONE,
                     std::optional<SDL_FRect> source_rect = std::nullopt,
                     bool is_flipped = false
     );
+
+    /**
+     * @brief 构造函数
+     * @param sprite 精灵对象
+     * @param resource_manager 资源管理器
+     * @param alignment 初始对齐方式
+     */
+    SpriteComponent(engine::render::Sprite&& sprite,
+                    engine::resource::ResourceManager& resource_manager,
+                    engine::utils::Alignment alignment = engine::utils::Alignment::NONE
+    );
+
     ~SpriteComponent() override = default;
 
     SpriteComponent(const SpriteComponent& other) = delete;
@@ -49,7 +69,7 @@ public:
 
     void setSpriteById(const std::string& texture_id, const std::optional<SDL_FRect>& source_rect = std::nullopt);
     void setIsFlipped(bool is_flipped) { sprite_.setIsFlipped(is_flipped); } // 设置翻转
-    void setIsHidden(bool is_hidden) { is_hidden_ = is_hidden; }        // 设置隐藏
+    void setIsHidden(bool is_hidden) { is_hidden_ = is_hidden; }             // 设置隐藏
     void setSourceRect(const std::optional<SDL_FRect>& source_rect);         // 设置精灵图原矩形；
     void setAlignment(engine::utils::Alignment alignment);
 
@@ -68,7 +88,7 @@ private:
     engine::utils::Alignment alignment_{engine::utils::Alignment::NONE}; // 对齐方式
     glm::vec2 sprite_size_{};                                            // 精灵尺寸
     glm::vec2 offset_{};                                                 // 偏移量
-    bool is_hidden_{false};                                               // 是否隐藏
+    bool is_hidden_{false};                                              // 是否隐藏
 };
 } // component
 } // engine

@@ -18,7 +18,17 @@ SpriteComponent::SpriteComponent(const std::string& texture_id, engine::resource
                                  engine::utils::Alignment alignment, std::optional<SDL_FRect> source_rect,
                                  bool is_flipped)
     : resource_manager_(resource_manager), sprite_{texture_id, source_rect, is_flipped}, alignment_(alignment) {
-    if (resource_manager == nullptr) {
+    if (resource_manager_ == nullptr) {
+        spdlog::critical("SpriteComponent: resource_manager == nullptr;");
+    }
+    spdlog::trace("create SpriteComponent completion");
+}
+
+SpriteComponent::SpriteComponent(engine::render::Sprite&& sprite, engine::resource::ResourceManager& resource_manager,
+                                 engine::utils::Alignment alignment): sprite_(std::move(sprite)),
+                                                                      resource_manager_(&resource_manager),
+                                                                      alignment_(alignment) {
+    if (resource_manager_ == nullptr) {
         spdlog::critical("SpriteComponent: resource_manager == nullptr;");
     }
     spdlog::trace("create SpriteComponent completion");
