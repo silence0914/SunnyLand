@@ -85,6 +85,10 @@ add_executable(${TARGET}
         src/engine/utils/action.h
         src/engine/component/tilelayer_component.cpp
         src/engine/component/tilelayer_component.h
+        src/engine/physics/physics_engine.cpp
+        src/engine/physics/physics_engine.h
+        src/engine/component/physics_component.cpp
+        src/engine/component/physics_component.h
 )
 
 # 链接库

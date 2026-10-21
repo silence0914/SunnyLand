@@ -8,6 +8,11 @@
 #include <memory>
 #include <chrono>
 
+
+namespace engine::physics {
+class PhysicsEngine;
+}
+
 struct SDL_Window;
 struct SDL_Renderer;
 
@@ -64,6 +69,8 @@ private:
     [[nodiscard]] bool initInputManager();
     [[nodiscard]] bool initContext();
     [[nodiscard]] bool initSceneManager();
+    [[nodiscard]] bool initPhysicsEngine();
+
 
 private:
     SDL_Window* window_{nullptr};
@@ -78,6 +85,7 @@ private:
     std::unique_ptr<engine::render::Renderer> renderer_;                  // 渲染
     std::unique_ptr<engine::input::InputManager> input_manager_;          // 输入管理
     std::unique_ptr<engine::scene::SceneManager> scene_manager_;          // 场景管理
+    std::unique_ptr<engine::physics::PhysicsEngine> physics_engine_;      // 物理引擎
 };
 }
 

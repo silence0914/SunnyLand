@@ -35,7 +35,7 @@ public:
     [[nodiscard]] float getRotation() const { return rotation_; }
     void setRotation(float rotation) { rotation_ = rotation; }
 
-    void translate(const glm::vec2& offset) { position_ += offset; }
+    void translate(const glm::vec2& offset) { position_ += offset; } // 设置偏移
 
 private:
     glm::vec2 position_{}; // 位置

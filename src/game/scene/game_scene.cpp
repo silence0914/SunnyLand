@@ -4,6 +4,7 @@
 
 #include "game_scene.h"
 
+#include "../../engine/component/physics_component.h"
 #include "../../engine/object/game_object.h"
 #include "../../engine/component/sprite_component.h"
 #include "../../engine/component/transform_component.h"
@@ -35,6 +36,7 @@ void GameScene::init() {
 void GameScene::handleInput() {
     Scene::handleInput();
     testCamera();
+    testObject();
 }
 
 void GameScene::update(const std::chrono::milliseconds& dt) {
@@ -54,10 +56,12 @@ void GameScene::clean() {
 void GameScene::createTestObject() {
     mylog::MyLog{}.trace("test create object of GameObject");
     auto test_object = std::make_unique<engine::object::GameObject>("test object");
+    test_object_ = test_object.get();
 
     test_object->addComponent<engine::component::TransformComponent>(glm::vec2{300.0f, 100.0f});
     test_object->addComponent<engine::component::SpriteComponent>("assets/textures/Props/big-crate.png",
                                                                   &getContext().getResourceManager());
+    test_object->addComponent<engine::component::PhysicsComponent>(context_.getPhysicsEngine());
 
     addGameObject(std::move(test_object));
 }
@@ -69,6 +73,20 @@ void GameScene::testCamera() {
     if (input_manager.isActionDown(std::string(engine::utils::action::MOVE_DOWN))) { camera.move({0, 1}); }
     if (input_manager.isActionDown(std::string(engine::utils::action::MOVE_LEFT))) { camera.move({-1, 0}); }
     if (input_manager.isActionDown(std::string(engine::utils::action::MOVE_RIGHT))) { camera.move({1, 0}); }
+}
+
+void GameScene::testObject() {
+    if (!test_object_) { return; }
+    auto& input_manager = context_.getInputManager();
+    if (input_manager.isActionDown(std::string(engine::utils::action::JUMP))) {
+        test_object_->getComponent<engine::component::TransformComponent>()->translate({400, 1});
+    }
+    if (input_manager.isActionDown(std::string(engine::utils::action::MOVE_LEFT))) {
+        test_object_->getComponent<engine::component::TransformComponent>()->translate({-1, 0});
+    }
+    if (input_manager.isActionDown(std::string(engine::utils::action::MOVE_RIGHT))) {
+        test_object_->getComponent<engine::component::TransformComponent>()->translate({1, 0});
+    }
 }
 } // scene
 // game

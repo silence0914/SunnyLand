@@ -22,6 +22,7 @@
 #include "../input/input_manager.h"
 #include "../object/game_object.h"
 #include "../component/transform_component.h"
+#include "../physics/physics_engine.h"
 #include "../scene/scene.h"
 #include "../scene/scene_manager.h"
 
@@ -58,9 +59,10 @@ bool GameApp::init() {
     if (!initCamera()) { return false; }
     if (!initRenderer()) { return false; }
     if (!initInputManager()) { return false; }
-    if (!initContext()) { return false; }
     if (!initSceneManager()) { return false; }
+    if (!initPhysicsEngine()) { return false; }
 
+    if (!initContext()) { return false; }
     auto scene = std::make_unique<game::scene::GameScene>("GameScene", *context_, *scene_manager_);
     scene_manager_->requestPushScene(std::move(scene));
 
@@ -97,6 +99,9 @@ void GameApp::render() {
 
 void GameApp::close() {
     spdlog::trace("game app close");
+
+    // 先关闭场景管理器 确保所有场景都被清理
+    scene_manager_->close();
 
     // 先释放Audio 后释放 windows; 否则音频退出会出错；
     resource_manager_.reset();
@@ -207,7 +212,8 @@ bool GameApp::initInputManager() {
 
 bool GameApp::initContext() {
     try {
-        context_ = std::make_unique<engine::core::Context>(*camera_, *renderer_, *input_manager_, *resource_manager_);
+        context_ = std::make_unique<engine::core::Context>(*camera_, *renderer_, *input_manager_, *resource_manager_,
+                                                           *physics_engine_);
     } catch (const std::exception& e) {
         spdlog::error("initContext failed; error : {}", e.what());
         return false;
@@ -220,6 +226,16 @@ bool GameApp::initSceneManager() {
         scene_manager_ = std::make_unique<engine::scene::SceneManager>(*context_);
     } catch (const std::exception& e) {
         spdlog::error("initSceneManager failed;error : {}", e.what());
+        return false;
+    }
+    return true;
+}
+
+bool GameApp::initPhysicsEngine() {
+    try {
+        physics_engine_ = std::make_unique<engine::physics::PhysicsEngine>();
+    } catch (const std::exception& e) {
+        spdlog::error("initPhysicsEngine failed;error : {}", e.what());
         return false;
     }
     return true;

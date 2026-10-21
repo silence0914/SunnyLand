@@ -6,7 +6,9 @@
 
 #include <spdlog/spdlog.h>
 
+#include "../core/context.h"
 #include "../object/game_object.h"
+#include "../physics/physics_engine.h"
 
 namespace engine {
 namespace scene {
@@ -32,6 +34,9 @@ void Scene::handleInput() {
 
 void Scene::update(const std::chrono::milliseconds& dt) {
     if (!is_initialized_) { return; }
+
+    // 先更新物理引擎；
+    context_.getPhysicsEngine().update(dt);
 
     for (auto it = game_objects_.begin(); it != game_objects_.end();) {
         auto& game_object = *it;

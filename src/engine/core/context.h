@@ -5,6 +5,10 @@
 #ifndef CONTEXT_H
 #define CONTEXT_H
 
+namespace engine::physics {
+class PhysicsEngine;
+}
+
 namespace engine::input {
 class InputManager;
 }
@@ -26,8 +30,12 @@ namespace engine::core {
  */
 class Context final {
 public:
-    Context(engine::render::Camera& camera, engine::render::Renderer& renderer,
-            engine::input::InputManager& input_manager, engine::resource::ResourceManager& resource_manager);
+    Context(engine::render::Camera& camera,
+            engine::render::Renderer& renderer,
+            engine::input::InputManager& input_manager,
+            engine::resource::ResourceManager& resource_manager,
+            engine::physics::PhysicsEngine&);
+
     ~Context() = default;
 
     Context(const Context& other) = delete;
@@ -40,12 +48,14 @@ public:
     [[nodiscard]] engine::render::Renderer& getRenderer() const { return renderer_; }
     [[nodiscard]] engine::input::InputManager& getInputManager() const { return input_manager_; }
     [[nodiscard]] engine::resource::ResourceManager& getResourceManager() const { return resource_manager_; }
+    [[nodiscard]] engine::physics::PhysicsEngine& getPhysicsEngine() const { return physics_engine_; }
 
 private:
     engine::render::Camera& camera_;
     engine::render::Renderer& renderer_;
     engine::input::InputManager& input_manager_;
     engine::resource::ResourceManager& resource_manager_;
+    engine::physics::PhysicsEngine& physics_engine_;
 };
 } // core
 // engine

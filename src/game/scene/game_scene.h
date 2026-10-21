@@ -27,9 +27,12 @@ public:
     void update(const std::chrono::milliseconds& dt) override;
     void render() override;
     void clean() override;
+
 private:
     void createTestObject();
     void testCamera();
+    void testObject();
+    engine::object::GameObject* test_object_{nullptr};
 };
 } // scene
 
