@@ -35,7 +35,7 @@ public:
      * @param use_gravity 该对象是否重力影响 默认true
      * @param mass 该对象的质量 默认1.0；
      */
-    PhysicsComponent(engine::physics::PhysicsEngine& physics_engine, bool use_gravity = true, float mass = 1.0f);
+    explicit PhysicsComponent(engine::physics::PhysicsEngine& physics_engine, bool use_gravity = true, float mass = 1.0f);
     ~PhysicsComponent() override = default;
 
     PhysicsComponent(const PhysicsComponent& other) = delete;

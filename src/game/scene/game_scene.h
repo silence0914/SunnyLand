@@ -29,12 +29,12 @@ public:
     void clean() override;
 
 private:
-    void createTestObject();
     void testCamera();
-    void testObject();
     void testCollisionPairs();
+    void testPlayer();
 
-    engine::object::GameObject* test_object_{nullptr};
+private:
+    engine::object::GameObject* player_{nullptr};
 };
 } // scene
 

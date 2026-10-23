@@ -23,7 +23,7 @@ public:
     virtual ~Collider() = default;
 
     virtual ColliderType getType() const = 0;
-    [[nodiscard]] glm::vec2 getAabbSize() const { return aabb_size_; }
+    [[nodiscard]] glm::vec2 getAABBSize() const { return aabb_size_; }
     void setAabbSize(const glm::vec2& aabb_size) { aabb_size_ = aabb_size; }
 
 protected:

@@ -15,8 +15,8 @@ bool checkCollision(const engine::component::ColliderComponent& a, const engine:
     auto a_transform = a.getTransform();
     auto b_transform = b.getTransform();
 
-    auto a_size = a_collider->getAabbSize();
-    auto b_size = b_collider->getAabbSize();
+    auto a_size = a_collider->getAABBSize();
+    auto b_size = b_collider->getAABBSize();
     auto a_pos = a_transform->getPosition();
     auto b_pos = b_transform->getPosition();
 

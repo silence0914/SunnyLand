@@ -39,6 +39,7 @@ void GameApp::Run() {
         time_->update();
         input_manager_->update();
         handleEvents();
+        spdlog::info(time_->getDeltaTime().count());
         update(time_->getDeltaTime());
         render();
     }

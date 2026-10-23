@@ -33,12 +33,9 @@ public:
 
     void registerCollisionLayer(engine::component::TileLayerComponent& layer);   // 注册用于碰撞检测的TileLayerComponent;
     void unregisterCollisionLayer(engine::component::TileLayerComponent& layer); // 注销用于碰撞检测的TileLayerComponent;
-    // 检测并处理游戏对象与瓦片间的碰撞；
-    void resolveTileCollisions(engine::component::PhysicsComponent& pc, const std::chrono::milliseconds& dt);
-    void resolveTileCollisions(engine::component::PhysicsComponent& pc, float dt); // 检测并处理游戏对象与瓦片间的碰撞；
+
 
     void update(const std::chrono::milliseconds& dt); // 核心循环， 更新所有注册的物理组件
-    void checkObjectCollisions();                     // 检测对象碰撞 并记录；
 
     // get/set
     [[nodiscard]] glm::vec2 getGravity() const { return gravity_; } // 获取当前全局重力
@@ -51,6 +48,11 @@ public:
     getCollisionPairs() const {
         return collision_pairs_;
     }
+
+private:
+    void checkObjectCollisions();                                                  // 检测对象碰撞 并记录；
+    void resolveTileCollisions(engine::component::PhysicsComponent& pc, float dt); // 检测并处理游戏对象与瓦片间的碰撞；
+    void resolveSolidObjectCollision(engine::object::GameObject& mov_obj, engine::object::GameObject& solid_obj);
 
 private:
     std::vector<engine::component::PhysicsComponent*> components_;              // 注册的物理组件容器 非拥有指针；

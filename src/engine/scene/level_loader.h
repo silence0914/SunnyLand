@@ -10,6 +10,9 @@
 #include <map>
 #include <glm/vec2.hpp>
 
+#include "../utils/action.h"
+#include "../utils/math.h"
+
 namespace engine::component {
 struct TileInfo;
 enum class TileType;
@@ -29,6 +32,41 @@ private:
     void loadImageLayer(const nlohmann::json& layer_json, Scene& scene);
     void loadTileLayer(const nlohmann::json& layer_json, Scene& scene);
     void loadObjectLayer(const nlohmann::json& layer_json, Scene& scene);
+
+    /**
+     * @brief 获取瓦片属性；
+     * @tparam T 属性类型
+     * @param tile_json 瓦片json数据
+     * @param property_name 属性名称
+     * @return 属性值， 如果不存在返回std::nullopt;
+     */
+    template<typename T>
+    std::optional<T> getTileProperty(const nlohmann::json& tile_json, const std::string& property_name) {
+        if (!tile_json.contains("properties")) { return std::nullopt; }
+        const auto& properties = tile_json["properties"];
+        for (const auto& property: properties) {
+            if (property.contains("name") && property["name"] == property_name) {
+                if (property.contains("value")) {
+                    return property["value"].get<T>();
+                }
+            }
+        }
+        return std::nullopt;
+    }
+
+    /**
+     * @brief 获取瓦片碰撞矩形
+     * @param tile_json 瓦片json数据
+     * @return 碰撞器矩形  如果不存在碰撞器 返回std::nullopt;
+     */
+    std::optional<engine::utils::Rect> getColliderRect(const nlohmann::json& tile_json);
+
+    /**
+     * @brief 根据全局id获取 瓦片json对象；
+     * @param gid 全局id
+     * @return 瓦片json对象；
+     */
+    std::optional<nlohmann::json> getTileJsonByGid(int gid) const;
 
     /**
      * @brief 根据全局id获取瓦片信息

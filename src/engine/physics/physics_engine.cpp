@@ -14,6 +14,8 @@
 #include "../log/my_log.h"
 #include "../object/game_object.h"
 
+constexpr std::string_view SOLID{"solid"};
+
 namespace engine {
 namespace physics {
 void PhysicsEngine::registerComponent(engine::component::PhysicsComponent& component) {
@@ -35,93 +37,6 @@ void PhysicsEngine::unregisterCollisionLayer(engine::component::TileLayerCompone
     auto it = std::remove(collision_tile_layers_.begin(), collision_tile_layers_.end(), &layer);
     collision_tile_layers_.erase(it, collision_tile_layers_.end());
     mylog::MyLog{}.trace("unregister collision layer success");
-}
-
-void PhysicsEngine::resolveTileCollisions(engine::component::PhysicsComponent& pc,
-                                          const std::chrono::milliseconds& dt) {
-    // 检查组件是否有效；
-    auto* obj = pc.getOwner();
-    if (!obj) { return; }
-    auto* tc = obj->getComponent<engine::component::TransformComponent>();
-    auto* cc = obj->getComponent<engine::component::ColliderComponent>();
-    if (!tc || !cc || !cc->isActive() || cc->isTrigger()) { return; }
-    auto world_aabb = cc->getWorldAABB();
-    auto obj_pos = world_aabb.position;
-    auto obj_size = world_aabb.size;
-    if (obj_size.x <= 0.0f || obj_size.y <= 0.0f) { return; }
-
-    auto tolerance = 1.0f;
-    auto ds = pc.getVelocity() * std::chrono::duration<float>(dt).count(); // 计算这一帧的位移；
-    auto new_obj_pos = obj_pos + ds;                                       // 计算位移后的新位置；
-    for (const auto& layer: collision_tile_layers_) {
-        if (!layer) { continue; }
-        auto tile_size = layer->getTileSize();
-
-        if (ds.x > 0.001f) {
-            // 向右移动； 检测右上和右下；
-            auto right_top_x = new_obj_pos.x + obj_size;
-            auto tile_x = static_cast<int>(floor(right_top_x.x / tile_size.x));
-            auto tile_y = static_cast<int>(floor(obj_pos.y / tile_size.y));
-            auto tile_y_bottom = static_cast<int>(floor((obj_pos.y + obj_size.y - tolerance) / tile_size.y));
-            auto tile_type_top = layer->getTileTypeAt({tile_x, tile_y});
-            auto tile_type_bottom = layer->getTileTypeAt({tile_x, tile_y_bottom});
-
-            if (tile_type_top == engine::component::TileType::SOLID ||
-                tile_type_bottom == engine::component::TileType::SOLID) {
-                new_obj_pos.x = tile_x * layer->getTileSize().x - obj_size.x;
-                pc.setVelocity({0.0f, pc.getVelocity().y});
-            }
-        } else if (ds.x < 0.001f) {
-            // 向左移动 检测左上和左下；
-            auto left_top_x = new_obj_pos.x;
-            auto tile_x = static_cast<int>(floor(left_top_x / tile_size.x));
-            auto tile_y = static_cast<int>(floor(obj_pos.y / tile_size.y));
-            auto tile_y_bottom = static_cast<int>(floor((obj_pos.y + obj_size.y - tolerance) / tile_size.y));
-            auto tile_type_top = layer->getTileTypeAt({tile_x, tile_y});
-            auto tile_type_bottom = layer->getTileTypeAt({tile_x, tile_y_bottom});
-
-            if (tile_type_top == engine::component::TileType::SOLID ||
-                tile_type_bottom == engine::component::TileType::SOLID) {
-                new_obj_pos.x = (tile_x + 1) * layer->getTileSize().x - obj_size.x;
-                pc.setVelocity({0.0f, pc.getVelocity().y});
-            }
-        }
-
-        if (ds.y > 0.001f) {
-            // 检查底部碰撞，需要分别测试左下和右下角
-            auto bottom_left_y = new_obj_pos.y + obj_size.y;
-            auto tile_y = static_cast<int>(floor(bottom_left_y / tile_size.y));
-
-            auto tile_x = static_cast<int>(floor(obj_pos.x / tile_size.x));
-            auto tile_type_left = layer->getTileTypeAt({tile_x, tile_y}); // 左下角瓦片类型
-            auto tile_x_right = static_cast<int>(floor((obj_pos.x + obj_size.x - tolerance) / tile_size.x));
-            auto tile_type_right = layer->getTileTypeAt({tile_x_right, tile_y}); // 右下角瓦片类型
-
-            if (tile_type_left == engine::component::TileType::SOLID || tile_type_right ==
-                engine::component::TileType::SOLID) {
-                // 到达地面！速度归零，y方向移动到贴着地面的位置
-                new_obj_pos.y = tile_y * layer->getTileSize().y - obj_size.y;
-                pc.setVelocity({pc.getVelocity().x, 0.0f});
-            }
-        } else if (ds.y < 0.001f) {
-            // 检查顶部碰撞，需要分别测试左上和右上角
-            auto top_left_y = new_obj_pos.y;
-            auto tile_y = static_cast<int>(floor(top_left_y / tile_size.y));
-
-            auto tile_x = static_cast<int>(floor(obj_pos.x / tile_size.x));
-            auto tile_type_left = layer->getTileTypeAt({tile_x, tile_y}); // 左上角瓦片类型
-            auto tile_x_right = static_cast<int>(floor((obj_pos.x + obj_size.x - tolerance) / tile_size.x));
-            auto tile_type_right = layer->getTileTypeAt({tile_x_right, tile_y}); // 右上角瓦片类型
-
-            if (tile_type_left == engine::component::TileType::SOLID || tile_type_right ==
-                engine::component::TileType::SOLID) {
-                // 撞到天花板！速度归零，y方向移动到贴着天花板的位置
-                new_obj_pos.y = static_cast<float>((tile_y + 1) * layer->getTileSize().y);
-                pc.setVelocity({pc.getVelocity().x, 0.0f});
-            }
-        }
-    }
-    tc->setPosition(new_obj_pos);
 }
 
 void PhysicsEngine::resolveTileCollisions(engine::component::PhysicsComponent& pc, float dt) {
@@ -215,7 +130,47 @@ void PhysicsEngine::resolveTileCollisions(engine::component::PhysicsComponent& p
         }
     }
     // 更新物体位置，并限制最大速度
-    tc->setPosition(new_obj_pos);
+    tc->translate(new_obj_pos - obj_pos);
+}
+
+void PhysicsEngine::resolveSolidObjectCollision(engine::object::GameObject& mov_obj,
+                                                engine::object::GameObject& solid_obj) {
+    auto move_tc = mov_obj.getComponent<engine::component::TransformComponent>();
+    auto move_pc = mov_obj.getComponent<engine::component::PhysicsComponent>();
+    auto move_cc = mov_obj.getComponent<engine::component::ColliderComponent>();
+    auto solid_cc = solid_obj.getComponent<engine::component::ColliderComponent>();
+
+    auto move_aabb = move_cc->getWorldAABB();
+    auto solid_aabb = solid_cc->getWorldAABB();
+
+    auto move_center = move_aabb.position + move_aabb.size / 2.0f;
+    auto solid_center = solid_aabb.position + solid_aabb.size / 2.0f;
+
+    // 计算两个包围盒重叠的部分；
+    auto overlap = glm::vec2{move_aabb.size / 2.0f + solid_aabb.size / 2.0f} - glm::abs(move_center - solid_center);
+    // 重叠范围过小；
+    if (overlap.x < 0.1f && overlap.y < 0.1f) { return; }
+    if (overlap.x < overlap.y) {
+        // 如果重叠部分在x方向上更小，则认为碰撞发生在x方向上（推出x方向平移向量最小）
+        if (move_center.x < solid_center.x) {
+            // 移动物体在左侧；让它贴着右边SOLID物体（相当于向左移出重叠部分），y方向正常移动
+            move_tc->translate(glm::vec2{-overlap.x, 0.0f});
+            // 如果运动物体在向右移动 则归零；
+            if (move_pc->getVelocity().x > 0.0f) { move_pc->setVelocityX(0.0f); }
+        } else {
+            move_tc->translate(glm::vec2{overlap.x, 0.0f});
+            if (move_pc->getVelocity().x < 0.0f) { move_pc->setVelocityX(0.0f); }
+        }
+    } else {
+        if (move_center.y < solid_center.y) {
+            // 移动物体在上侧；
+            move_tc->translate(glm::vec2{0.0f, -overlap.y});
+            if (move_pc->getVelocity().y > 0.0f) { move_pc->setVelocityY(0.0f); }
+        } else {
+            move_tc->translate(glm::vec2{0.0f, overlap.y});
+            if (move_pc->getVelocity().y < 0.0f) { move_pc->setVelocityY(0.0f); }
+        }
+    }
 }
 
 void PhysicsEngine::update(const std::chrono::milliseconds& dt) {
@@ -227,7 +182,10 @@ void PhysicsEngine::update(const std::chrono::milliseconds& dt) {
 
         float dt_s = std::chrono::duration<float>(dt).count();
         // 应用重力；  v -= g * t;
-        if (component->isUseGravity()) { component->addVelocity({gravity_ * dt_s}); }
+        if (component->isUseGravity()) {
+            glm::vec2 g{gravity_ * dt_s};
+            component->addVelocity(g);
+        }
         // 更新速度； v += a * dt; a = F / m;
         auto velocity = (component->getForce() / component->getMass()) * dt_s;
         component->addVelocity(velocity);
@@ -258,8 +216,15 @@ void PhysicsEngine::checkObjectCollisions() {
             if (!cc_b || !cc_b->isActive()) { continue; }
 
             if (engine::physics::collision::checkCollision(*cc_a, *cc_b)) {
-                // 记录碰撞
-                collision_pairs_.emplace_back(obj_a, obj_b);
+                // 可移动物体与solid物体 碰撞； 直接处理位置变化；
+                if (obj_a->getTag() != SOLID && obj_b->getTag() == SOLID) {
+                    resolveSolidObjectCollision(*obj_a, *obj_b);
+                } else if (obj_a->getTag() == SOLID && obj_b->getTag() != SOLID) {
+                    resolveSolidObjectCollision(*obj_b, *obj_a);
+                } else {
+                    // 记录碰撞
+                    collision_pairs_.emplace_back(obj_a, obj_b);
+                }
             }
         }
     }

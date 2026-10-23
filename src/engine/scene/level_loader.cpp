@@ -17,8 +17,11 @@
 #include "../object/game_object.h"
 #include <memory>
 
+#include "../component/collider_component.h"
+#include "../component/physics_component.h"
 #include "../component/sprite_component.h"
 #include "../core/context.h"
+#include "../physics/aabb_collider.h"
 
 namespace engine {
 namespace scene {
@@ -53,6 +56,9 @@ constexpr static std::string_view ROTATION{"rotation"};
 constexpr static std::string_view PROPERTIES{"properties"};
 constexpr static std::string_view VALUE{"value"};
 constexpr static std::string_view SOLID{"solid"};
+constexpr static std::string_view OBJECT_GROUP{"objectgroup"};
+constexpr static std::string_view TAG{"tag"};
+constexpr static std::string_view GRAVITY{"gravity"};
 
 
 bool LevelLoader::loadLevel(const std::string& map_path, Scene& scene) {
@@ -68,7 +74,8 @@ bool LevelLoader::loadLevel(const std::string& map_path, Scene& scene) {
     try {
         file >> json_data;
     } catch (const std::exception& e) {
-        mylog::MyLog{}.error("loadLevel,file to json failed;map_path = {},scene = {}", map_path, scene.getSceneName());
+        mylog::MyLog{}.error("loadLevel,file to json failed;map_path = {},scene = {}，error = {}",
+                             map_path, scene.getSceneName(), e.what());
         return false;
     }
 
@@ -203,13 +210,85 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
         const std::string& object_name = object.value(NAME, NONE);
 
         // 创建游戏对象并添加组件；
-        auto game_object = std::make_unique<engine::object::GameObject>(object_name);
+        std::unique_ptr<engine::object::GameObject> game_object = std::make_unique<
+            engine::object::GameObject>(object_name);
         game_object->addComponent<engine::component::TransformComponent>(position, scale, rotation);
         game_object->addComponent<engine::component::SpriteComponent>(std::move(tile_info.sprite),
                                                                       scene.getContext().getResourceManager());
-        scene.addGameObject(std::move(game_object));
+
+        // 获取瓦片json信息；
+        auto tile_json = getTileJsonByGid(gid);
+
+        // 获取碰撞信息 如果是solid添加物理组件；
+        if (tile_info.type == engine::component::TileType::SOLID) {
+            auto collider = std::make_unique<engine::physics::AABBCollider>(src_size);
+            // 添加物理组件  组件不受重力影响；
+            game_object->addComponent<engine::component::PhysicsComponent>(scene.getContext().getPhysicsEngine(),
+                                                                           false);
+            game_object->setTag(std::string(SOLID)); // 设置瓦片标签
+        } else if (auto rect = getColliderRect(tile_json.value()); rect) {
+            auto collider = std::make_unique<engine::physics::AABBCollider>(rect->size);
+            // 添加物理组件  组件不受重力影响；
+            engine::component::ColliderComponent* cc = game_object->addComponent<
+                engine::component::ColliderComponent>(std::move(collider));
+            cc->setOffset(rect->position);
+            game_object->addComponent<engine::component::PhysicsComponent>(scene.getContext().getPhysicsEngine(),
+                                                                           false);
+        }
+        auto tag = getTileProperty<std::string>(tile_json.value(), std::string{TAG});
+        if (tag.has_value()) { game_object->setTag(tag.value()); }
+
+        // 获取并设置重力信息
+        auto gravity = getTileProperty<bool>(tile_json.value(), std::string{GRAVITY});
+        if (gravity) {
+            engine::component::PhysicsComponent* pc = game_object->getComponent<engine::component::PhysicsComponent>();
+            if (pc) {
+                pc->setUseGravity(gravity.value());
+            } else {
+                game_object->addComponent<engine::component::PhysicsComponent>(scene.getContext().getPhysicsEngine(),
+                                                                               gravity.value());
+            }
+        }
+
+        scene.addGameObject(std::move(game_object)); // 设置标签
         mylog::MyLog{}.info("load Object {} success", object_name);
     }
+}
+
+std::optional<engine::utils::Rect> LevelLoader::getColliderRect(const nlohmann::json& tile_json) {
+    if (!tile_json.contains(OBJECT_GROUP)) { return std::nullopt; }
+    auto& object_group = tile_json[OBJECT_GROUP];
+    if (!object_group.contains(OBJECTS)) { return std::nullopt; }
+    auto& objects = object_group[OBJECTS];
+    for (const auto& object: objects) {
+        auto rect = engine::utils::Rect{
+            glm::vec2{object.value(X, 0.0f), object.value(Y, 0.0f)},
+            glm::vec2{object.value(WIDTH, 0.0f), object.value(HEIGHT, 0.0f)}
+        };
+        if (rect.size.x > 0 && rect.size.y > 0) {
+            return rect;
+        }
+    }
+    return std::nullopt;
+}
+
+std::optional<nlohmann::json> LevelLoader::getTileJsonByGid(int gid) const {
+    // 查找tileset中  键小于等于 gid 的最近的元素
+    auto tileset_it = tileset_data_.upper_bound(gid);
+    if (tileset_it == tileset_data_.begin()) { return std::nullopt; }
+    --tileset_it;
+    // 获取图块集json 对象
+    const auto& tileset = tileset_it->second;
+    auto local_id = gid - tileset_it->first;
+    if (!tileset.contains(TILES)) { return std::nullopt; }
+    const auto& tiles_json = tileset[TILES];
+    for (const auto& tile_json: tiles_json) {
+        auto tile_id = tile_json.value(ID, 0);
+        if (tile_id == local_id) {
+            return tile_json;
+        }
+    }
+    return std::nullopt;
 }
 
 

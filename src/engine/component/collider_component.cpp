@@ -26,7 +26,7 @@ void ColliderComponent::updateOffset() {
     if (!collider_) { return; }
 
     // 获取碰撞盒 最小包围盒尺寸
-    auto collider_size = collider_->getAabbSize();
+    auto collider_size = collider_->getAABBSize();
     if (collider_size.x <= 0.0f || collider_size.y <= 0.0f) {
         offset_ = {0.0f, 0.0f};
         return;
@@ -71,7 +71,7 @@ engine::utils::Rect ColliderComponent::getWorldAABB() const {
         return {glm::vec2(0.0f, 0.0f)};
     }
     const glm::vec2 top_left_pos = transform_->getPosition() + offset_;
-    const glm::vec2 base_size = collider_->getAabbSize();
+    const glm::vec2 base_size = collider_->getAABBSize();
     const glm::vec2 scale = transform_->getScale();
     glm::vec2 scale_size = base_size * scale;
     return engine::utils::Rect{top_left_pos, scale_size};
