@@ -51,6 +51,22 @@ public:
         clampVelocity();
     }
 
+    void setVelocity(const glm::vec2& velocity) {
+        velocity_ = velocity;
+        clampVelocity();
+    } // 设置速度
+
+    void setVelocityX(float vx) {
+        velocity_.x = vx;
+        clampVelocity();
+    } // 设置x方向速度
+
+    void setVelocityY(float vy) {
+        velocity_.y = vy;
+        clampVelocity();
+    } // 设置y方向速度
+
+
     [[nodiscard]] glm::vec2 getVelocity() const { return velocity_; } // 获取速度
     [[nodiscard]] float getMass() const { return mass_; }             // 获取质量
     [[nodiscard]] bool isUseGravity() const { return use_gravity_; }  // 是否守重力影响
@@ -58,10 +74,7 @@ public:
     [[nodiscard]] glm::vec2 getForce() const { return force_; }
     [[nodiscard]] engine::component::TransformComponent* getTransform() const { return transform_; }
 
-    void setVelocity(const glm::vec2& velocity) {
-        velocity_ = velocity;
-        clampVelocity();
-    }                                                                    // 设置速度
+
     void setMass(float mass) { mass_ = mass; }                           // 设置质量
     void setUseGravity(bool use_gravity) { use_gravity_ = use_gravity; } // 设置是否受重力影响
     void setEnabled(bool enabled) { enabled_ = enabled; }                // 设置是否激活

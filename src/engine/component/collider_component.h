@@ -38,8 +38,8 @@ public:
     [[nodiscard]] glm::vec2 getOffset() const { return offset_; }                      // 碰撞盒偏移量；
     [[nodiscard]] engine::utils::Alignment getAlignment() const { return alignment_; } // 碰撞盒对齐方式
     [[nodiscard]] engine::utils::Rect getWorldAABB() const;                            // 获取世界坐标下的最小包围 碰撞盒
-    [[nodiscard]] bool isIsTrigger() const { return is_trigger_; }                     // 是否为触发器
-    [[nodiscard]] bool isIsActive() const { return is_active_; }                       // 是否激活
+    [[nodiscard]] bool isTrigger() const { return is_trigger_; }                     // 是否为触发器
+    [[nodiscard]] bool isActive() const { return is_active_; }                       // 是否激活
 
     void setOffset(const glm::vec2& offset) { offset_ = offset; }                     // 设置碰撞盒偏移量；
     void setAlignment(engine::utils::Alignment alignment) { alignment_ = alignment; } // 设置碰撞盒对齐方式

@@ -18,6 +18,7 @@
 #include "../../engine/render/camera.h"
 #include "../../engine/scene/level_loader.h"
 #include "../../engine/utils/action.h"
+#include "../../engine/component/tilelayer_component.h"
 
 namespace game::scene {
 GameScene::GameScene(std::string name, engine::core::Context& context, engine::scene::SceneManager& scene_manager)
@@ -29,6 +30,15 @@ void GameScene::init() {
     // 加载关卡
     engine::scene::LevelLoader level_loader;
     level_loader.loadLevel("assets/maps/level1.tmj", *this);
+
+    // 注册“main”层到物理引擎
+    auto main_layer = findGameObjectByName("main");
+    if (main_layer) {
+        auto* tile_layer = main_layer->getComponent<engine::component::TileLayerComponent>();
+        if (tile_layer) {
+            context_.getPhysicsEngine().registerCollisionLayer(*tile_layer);
+        }
+    }
 
     createTestObject();
 
@@ -62,10 +72,10 @@ void GameScene::createTestObject() {
     auto test_object = std::make_unique<engine::object::GameObject>("test object");
     test_object_ = test_object.get();
 
-    test_object->addComponent<engine::component::TransformComponent>(glm::vec2{100.0f, 100.0f});
+    test_object->addComponent<engine::component::TransformComponent>(glm::vec2{100.0f, 50.0f});
     test_object->addComponent<engine::component::SpriteComponent>("assets/textures/Props/big-crate.png",
                                                                   &getContext().getResourceManager());
-    test_object->addComponent<engine::component::PhysicsComponent>(context_.getPhysicsEngine(), false);
+    test_object->addComponent<engine::component::PhysicsComponent>(context_.getPhysicsEngine());
     test_object->addComponent<engine::component::ColliderComponent>
             (std::make_unique<engine::physics::AABBCollider>(glm::vec2{32.0f, 32.0f}));
 
@@ -93,20 +103,28 @@ void GameScene::testCamera() {
 void GameScene::testObject() {
     if (!test_object_) { return; }
     auto& input_manager = context_.getInputManager();
-    // if (input_manager.isActionDown(std::string(engine::utils::action::JUMP))) {
-    //     test_object_->getComponent<engine::component::TransformComponent>()->translate({400, 1});
+
+    auto* pc = test_object_->getComponent<engine::component::PhysicsComponent>();
+    if (!pc) { return; }
+
+    if (input_manager.isActionPressed(std::string(engine::utils::action::JUMP))) {
+        pc->setVelocityY(-400.0f);
+    }
+    // if (input_manager.isActionDown(std::string(engine::utils::action::MOVE_UP))) {
+    //     test_object_->getComponent<engine::component::TransformComponent>()->translate({0, -1});
     // }
-    if (input_manager.isActionDown(std::string(engine::utils::action::MOVE_UP))) {
-        test_object_->getComponent<engine::component::TransformComponent>()->translate({0, -1});
-    }
-    if (input_manager.isActionDown(std::string(engine::utils::action::MOVE_DOWN))) {
-        test_object_->getComponent<engine::component::TransformComponent>()->translate({0, 1});
-    }
+    // if (input_manager.isActionDown(std::string(engine::utils::action::MOVE_DOWN))) {
+    //     test_object_->getComponent<engine::component::TransformComponent>()->translate({0, 1});
+    // }
     if (input_manager.isActionDown(std::string(engine::utils::action::MOVE_LEFT))) {
-        test_object_->getComponent<engine::component::TransformComponent>()->translate({-1, 0});
+        pc->setVelocityX(-100.0f);
+    } else {
+        pc->setVelocityX(pc->getVelocity().x * 0.9f);
     }
     if (input_manager.isActionDown(std::string(engine::utils::action::MOVE_RIGHT))) {
-        test_object_->getComponent<engine::component::TransformComponent>()->translate({1, 0});
+        pc->setVelocityX(100.0f);
+    } else {
+        pc->setVelocityX(pc->getVelocity().x * 0.9f);
     }
 }
 

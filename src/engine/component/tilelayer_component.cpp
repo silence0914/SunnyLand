@@ -8,6 +8,7 @@
 #include "../core/context.h"
 #include "../log/log_manager.h"
 #include "../log/my_log.h"
+#include "../physics/physics_engine.h"
 #include "../render/renderer.h"
 
 namespace engine {
@@ -75,6 +76,10 @@ void TileLayerComponent::render(engine::core::Context& context) {
             }
         }
     }
+}
+
+void TileLayerComponent::clear() {
+    // physics_engine_->unregisterComponent(*this);
 }
 } // component
 } // engine

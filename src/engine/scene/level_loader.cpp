@@ -50,6 +50,9 @@ constexpr static std::string_view GID{"gid"};
 constexpr static std::string_view X{"x"};
 constexpr static std::string_view Y{"y"};
 constexpr static std::string_view ROTATION{"rotation"};
+constexpr static std::string_view PROPERTIES{"properties"};
+constexpr static std::string_view VALUE{"value"};
+constexpr static std::string_view SOLID{"solid"};
 
 
 bool LevelLoader::loadLevel(const std::string& map_path, Scene& scene) {
@@ -179,7 +182,7 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
         // 根据gid获取信息；
         auto tile_info = getTileInfoByGid(gid);
         if (tile_info.sprite.getTextureId().empty()) {
-            mylog::MyLog{}.error("gid = '{}' need texture_id",gid);
+            mylog::MyLog{}.error("gid = '{}' need texture_id", gid);
             continue;
         }
         // 获取transform信息；
@@ -238,7 +241,7 @@ engine::component::TileInfo LevelLoader::getTileInfoByGid(int gid) {
             static_cast<float>(tile_size_.y)
         };
         engine::render::Sprite sprite{texture_id, texture_rect};
-        return engine::component::TileInfo{sprite, engine::component::TileType::NORMAL};
+        return engine::component::TileInfo{sprite, getTileTypeById(tileset, local_id)};
     } else {
         // 多图片情况
         if (!tileset.contains(TILES)) {
@@ -264,7 +267,7 @@ engine::component::TileInfo LevelLoader::getTileInfoByGid(int gid) {
                 static_cast<float>(tile_json.value(HEIGHT, image_height))
             };
             engine::render::Sprite sprite{texture_id, texture_rect};
-            return engine::component::TileInfo{sprite, engine::component::TileType::NORMAL};
+            return engine::component::TileInfo{sprite, getTileType(tile_json)};
         }
     }
     mylog::MyLog{}.error("tileset '{}' have no tile;gid = {}", tileset_it->first, gid);
@@ -297,6 +300,27 @@ std::string LevelLoader::resolvePath(const std::string& relative_path, const std
     } catch (const std::exception& e) {
         spdlog::error("resolvePath failed;image_path = {};error = {}", relative_path, e.what());
         return "";
+    }
+}
+
+engine::component::TileType LevelLoader::getTileType(const nlohmann::json& tile_json) {
+    if (!tile_json.contains(PROPERTIES)) { return engine::component::TileType::NORMAL; }
+    auto& properties = tile_json[PROPERTIES];
+    for (auto& property: properties) {
+        if (property.contains(NAME) && property[NAME] == "solid") {
+            auto is_solid = property.value(VALUE, false);
+            return is_solid ? engine::component::TileType::SOLID : engine::component::TileType::NORMAL;
+        }
+    }
+}
+
+engine::component::TileType LevelLoader::getTileTypeById(const nlohmann::json& tileset_json, int local_id) {
+    if (!tileset_json.contains(TILES)) { return engine::component::TileType::NORMAL; }
+    auto& tiles = tileset_json[TILES];
+    for (auto& tile: tiles) {
+        if (tile.contains(ID) && tile[ID] == local_id) {
+            return getTileType(tile);
+        }
     }
 }
 } // scene

@@ -9,6 +9,11 @@
 #include "component.h"
 #include "../render/sprite.h"
 
+
+namespace engine::physics {
+class PhysicsEngine;
+}
+
 namespace engine {
 namespace component {
 enum class TileType {
@@ -21,7 +26,7 @@ struct TileInfo {
     engine::render::Sprite sprite; // 瓦片素材对象
     TileType type;                 // 瓦片类型；
     explicit TileInfo(engine::render::Sprite s = engine::render::Sprite(),
-             TileType T = TileType::EMPTY) : sprite(std::move(s)), type(T) {};
+                      TileType T = TileType::EMPTY) : sprite(std::move(s)), type(T) {};
 };
 
 /**
@@ -71,18 +76,21 @@ public:
 
     void setOffset(const glm::vec2& offset) { this->offset_ = offset; } // 设置偏移量
     void setIsHidden(bool is_hidden) { is_hidden_ = is_hidden; }        // 设置是否隐藏；
+    void setPhysicsEngine(engine::physics::PhysicsEngine& physics_engine) { physics_engine_ = &physics_engine; }
 
 protected:
     void init() override;
     void update(const std::chrono::milliseconds&, engine::core::Context&) override {};
     void render(engine::core::Context& context) override;
+    void clear() override;
 
 private:
-    glm::ivec2 tile_size_;         // 单个瓦片的尺寸
-    glm::ivec2 map_size_;          // 地图尺寸
-    std::vector<TileInfo> tiles_;  // 储存所有瓦片信息
-    glm::vec2 offset_{0.0f, 0.0f}; // 瓦片层在场景中的偏移量；
-    bool is_hidden_{false};        // 是否隐藏
+    glm::ivec2 tile_size_;                                    // 单个瓦片的尺寸
+    glm::ivec2 map_size_;                                     // 地图尺寸
+    std::vector<TileInfo> tiles_;                             // 储存所有瓦片信息
+    glm::vec2 offset_{0.0f, 0.0f};                            // 瓦片层在场景中的偏移量；
+    bool is_hidden_{false};                                   // 是否隐藏
+    engine::physics::PhysicsEngine* physics_engine_{nullptr}; // 物理引擎指针；
 };
 } // component
 } // engine

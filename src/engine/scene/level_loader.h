@@ -12,6 +12,7 @@
 
 namespace engine::component {
 struct TileInfo;
+enum class TileType;
 }
 
 namespace engine::scene {
@@ -50,6 +51,21 @@ private:
      * @return 解析后的完整路径；
      */
     std::string resolvePath(const std::string& relative_path, const std::string& file_path);
+
+    /**
+     * @brief 更具瓦片json对象获取瓦片类型；
+     * @param tile_json 瓦片json数据
+     * @return 瓦片类型
+     */
+    engine::component::TileType getTileType(const nlohmann::json& tile_json);
+
+    /**
+     * @brief 根据图块集中的id获取瓦片类型；
+     * @param tileset_json 图块集中的json数据
+     * @param local_id 图块集中的id；
+     * @return 瓦片类型
+     */
+    engine::component::TileType getTileTypeById(const nlohmann::json& tileset_json, int local_id);
 
 private:
     std::string map_path_{};                     // 地图路径
