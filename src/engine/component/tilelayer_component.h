@@ -17,9 +17,16 @@ class PhysicsEngine;
 namespace engine {
 namespace component {
 enum class TileType {
-    EMPTY,  // 空白瓦片
-    NORMAL, // 普通瓦片
-    SOLID,  // 静止可碰撞瓦片
+    EMPTY,     // 空白瓦片
+    NORMAL,    // 普通瓦片
+    SOLID,     // 静止可碰撞瓦片
+    UNISOLID,  // 单向静止可碰撞瓦片
+    SLOPE_0_1, // 斜坡瓦片 左0 右1
+    SLOPE_0_2, // 斜坡瓦片 左0 右2
+    SLOPE_1_0, // 斜坡瓦片 左1 右0
+    SLOPE_1_2, // 斜坡瓦片 左1 右2
+    SLOPE_2_0, // 斜坡瓦片 左2 右0
+    SLOPE_2_1, // 斜坡瓦片 左2 右1
 };
 
 struct TileInfo {

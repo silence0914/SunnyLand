@@ -22,6 +22,8 @@ void Time::update() {
     }
     auto start_time = std::chrono::steady_clock::now();
     delta_time_ = std::chrono::duration_cast<std::chrono::milliseconds>(start_time - last_time_);
+    if (delta_time_ > std::chrono::milliseconds{33}) { delta_time_ = std::chrono::milliseconds{33}; }
+
     last_time_ = start_time;
 
     calculateCurrentFps(start_time);

@@ -59,6 +59,8 @@ constexpr static std::string_view SOLID{"solid"};
 constexpr static std::string_view OBJECT_GROUP{"objectgroup"};
 constexpr static std::string_view TAG{"tag"};
 constexpr static std::string_view GRAVITY{"gravity"};
+static std::string SLOPE{"slope"};
+constexpr static std::string_view UNISOLID{"unisolid"};
 
 
 bool LevelLoader::loadLevel(const std::string& map_path, Scene& scene) {
@@ -386,9 +388,26 @@ engine::component::TileType LevelLoader::getTileType(const nlohmann::json& tile_
     if (!tile_json.contains(PROPERTIES)) { return engine::component::TileType::NORMAL; }
     auto& properties = tile_json[PROPERTIES];
     for (auto& property: properties) {
-        if (property.contains(NAME) && property[NAME] == "solid") {
+        if (!property.contains(NAME)) { continue; }
+        const auto& property_name = property[NAME];
+        if (property_name == "solid") {
             auto is_solid = property.value(VALUE, false);
             return is_solid ? engine::component::TileType::SOLID : engine::component::TileType::NORMAL;
+        } else if (property_name == SLOPE) {
+            auto slope_type = property.value(VALUE, "");
+            if (SLOPE == "0_1")return engine::component::TileType::SLOPE_0_1;
+            else if (SLOPE == "1_0")return engine::component::TileType::SLOPE_1_0;
+            else if (SLOPE == "0_2")return engine::component::TileType::SLOPE_0_2;
+            else if (SLOPE == "2_0") return engine::component::TileType::SLOPE_2_0;
+            else if (SLOPE == "1_2") return engine::component::TileType::SLOPE_1_2;
+            else if (SLOPE == "2_1") return engine::component::TileType::SLOPE_2_1;
+            else {
+                spdlog::error("unknown slope type;type = {}", slope_type);
+                return engine::component::TileType::NORMAL;
+            }
+        } else if (property_name == UNISOLID.data()) {
+            auto is_unisolid = property.value(VALUE, false);
+            return is_unisolid ? engine::component::TileType::UNISOLID : engine::component::TileType::NORMAL;
         }
     }
 }

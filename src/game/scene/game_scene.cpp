@@ -40,11 +40,25 @@ void GameScene::init() {
         }
     }
 
+    // 获取玩家对象
     player_ = findGameObjectByName("player");
     if (!player_) {
         mylog::MyLog{}.error("player == nullptr");
         return;
     }
+
+    // 相机更碎玩家
+    auto* player_transform = player_->getComponent<engine::component::TransformComponent>();
+    if (player_transform) {
+        context_.getCamera().setTarget(*player_transform);
+    }
+
+    // 设置相机边界
+    auto world_size = main_layer->getComponent<engine::component::TileLayerComponent>()->getWorldSize();
+    context_.getCamera().setLimitBounds(engine::utils::Rect{glm::vec2{0.0f}, world_size});
+
+    // 设置世界边界；
+    context_.getPhysicsEngine().setWorldBounds(engine::utils::Rect{glm::vec2{0.0f}, world_size});
 
     Scene::init();
     mylog::MyLog{}.trace("init success");

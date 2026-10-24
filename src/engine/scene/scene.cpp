@@ -9,6 +9,7 @@
 #include "../core/context.h"
 #include "../object/game_object.h"
 #include "../physics/physics_engine.h"
+#include "../render/camera.h"
 
 namespace engine {
 namespace scene {
@@ -37,6 +38,9 @@ void Scene::update(const std::chrono::milliseconds& dt) {
 
     // 先更新物理引擎；
     context_.getPhysicsEngine().update(dt);
+
+    // 更新相机
+    context_.getCamera().update(dt);
 
     for (auto it = game_objects_.begin(); it != game_objects_.end();) {
         auto& game_object = *it;

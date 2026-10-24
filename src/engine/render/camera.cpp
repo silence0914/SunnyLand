@@ -6,6 +6,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include "../component/transform_component.h"
+
 
 namespace engine::render {
 Camera::Camera(const glm::vec2& viewport_size, const glm::vec2& position,
@@ -16,7 +18,18 @@ Camera::Camera(const glm::vec2& viewport_size, const glm::vec2& position,
 }
 
 void Camera::update(const std::chrono::milliseconds& dt) {
-    // TODO 相机跟随目标
+    if (target_ == nullptr) { return; }
+    glm::vec2 target_pos = target_->getPosition();
+    glm::vec2 desired_position = target_pos - viewport_size_ / 2.0f; // 计算目标位置 使目标处于视口中心；
+    auto distance = glm::distance(position_, desired_position);
+    constexpr float SNAP_THRESHOLD = 1.0f;
+    if (distance < SNAP_THRESHOLD) {
+        position_ = desired_position;
+    } else {
+        position_ = glm::mix(position_, desired_position, smooth_speed * std::chrono::duration<float>(dt).count());
+        position_ = glm::vec2(glm::round(position_.x), glm::round(position_.y)); // 四舍五入到整数；
+    }
+    clampPosition();
 }
 
 void Camera::move(const glm::vec2& offset) {
@@ -44,6 +57,8 @@ void Camera::setPosition(const glm::vec2& position) {
     clampPosition();
 }
 
+engine::component::TransformComponent* Camera::getTarget() const { return target_; }
+
 void Camera::setLimitBounds(const std::optional<engine::utils::Rect>& limit_bounds) {
     limit_bounds_ = limit_bounds;
 }
@@ -53,6 +68,8 @@ void Camera::setViewportSize(const glm::vec2& viewport_size) {
         viewport_size_ = viewport_size;
     }
 }
+
+void Camera::setTarget(engine::component::TransformComponent& target) { target_ = &target; }
 
 void Camera::clampPosition() {
     if (!limit_bounds_.has_value()) { return; }
