@@ -29,9 +29,8 @@ public:
     void clean() override;
 
 private:
-    void testCamera();
-    void testCollisionPairs();
-    void testPlayer();
+    [[nodiscard]] bool initLevel();
+    [[nodiscard]] bool initPlayer();
 
 private:
     engine::object::GameObject* player_{nullptr};

@@ -76,6 +76,7 @@ void PhysicsEngine::resolveTileCollisions(engine::component::PhysicsComponent& p
                 // 撞墙了！速度归零，x方向移动到贴着墙的位置
                 new_obj_pos.x = tile_x * layer->getTileSize().x - obj_size.x;
                 pc.setVelocityX(0.0f);
+                pc.setCollidedRight(true);
             } else {
                 // 处理右下斜坡的瓦片
                 auto width_right = new_obj_pos.x + obj_size.x - tile_x * tile_size.x;
@@ -83,6 +84,7 @@ void PhysicsEngine::resolveTileCollisions(engine::component::PhysicsComponent& p
                 if (height_right > 0.0f) {
                     float new_y = (tile_y_bottom + 1.0f) * layer->getTileSize().y - obj_size.y - height_right;
                     if (new_obj_pos.y > new_y) { new_obj_pos.y = new_y; }
+                    pc.setCollidedBelow(true);
                 }
             }
         } else if (ds.x < 0.0f) {
@@ -100,12 +102,15 @@ void PhysicsEngine::resolveTileCollisions(engine::component::PhysicsComponent& p
                 // 撞墙了！速度归零，x方向移动到贴着墙的位置
                 new_obj_pos.x = static_cast<float>((tile_x + 1) * layer->getTileSize().x);
                 pc.setVelocityX(0.0f);
+                pc.setCollidedLeft(true);
             } else {
                 auto width_left = new_obj_pos.x - tile_x * tile_size.x;
                 auto height_left = getTileHeightWidth(width_left, tile_type_bottom, tile_size);
                 if (height_left > 0.0f) {
                     float new_y = (tile_y_bottom + 1.0f) * layer->getTileSize().y - obj_size.y - height_left;
                     if (new_obj_pos.y > new_y) { new_obj_pos.y = new_y; }
+
+                    pc.setCollidedBelow(true);
                 }
             }
         }
@@ -127,6 +132,7 @@ void PhysicsEngine::resolveTileCollisions(engine::component::PhysicsComponent& p
                 // 到达地面！速度归零，y方向移动到贴着地面的位置
                 new_obj_pos.y = tile_y * layer->getTileSize().y - obj_size.y;
                 pc.setVelocityY(0.0f);
+                pc.setCollidedBelow(true);
             } else {
                 // 检测斜坡瓦片 下方两个点都要检测；
                 auto width_left = obj_pos.x - tile_x * tile_size.x;
@@ -139,6 +145,7 @@ void PhysicsEngine::resolveTileCollisions(engine::component::PhysicsComponent& p
                     float new_y = (tile_y + 1) * layer->getTileSize().y - obj_size.y - height;
                     if (new_obj_pos.y > new_y) { new_obj_pos.y = new_y; }
                     pc.setVelocityY(0.0f);
+                    pc.setCollidedBelow(true);
                 }
             }
         } else if (ds.y < 0.0f) {
@@ -154,8 +161,9 @@ void PhysicsEngine::resolveTileCollisions(engine::component::PhysicsComponent& p
             if (tile_type_left == engine::component::TileType::SOLID || tile_type_right ==
                 engine::component::TileType::SOLID) {
                 // 撞到天花板！速度归零，y方向移动到贴着天花板的位置
-                new_obj_pos.y = (tile_y + 1) * layer->getTileSize().y;
+                new_obj_pos.y = static_cast<float>(tile_y + 1) * layer->getTileSize().y;
                 pc.setVelocityY(0.0f);
+                pc.setCollidedAbove(true);
             }
         }
     }
@@ -185,20 +193,32 @@ void PhysicsEngine::resolveSolidObjectCollision(engine::object::GameObject& mov_
         if (move_center.x < solid_center.x) {
             // 移动物体在左侧；让它贴着右边SOLID物体（相当于向左移出重叠部分），y方向正常移动
             move_tc->translate(glm::vec2{-overlap.x, 0.0f});
-            // 如果运动物体在向右移动 则归零；
-            if (move_pc->getVelocity().x > 0.0f) { move_pc->setVelocityX(0.0f); }
+            // 速度为正  （向右） 则归零；
+            if (move_pc->getVelocity().x > 0.0f) {
+                move_pc->setVelocityX(0.0f);
+                move_pc->setCollidedRight(true);
+            }
         } else {
             move_tc->translate(glm::vec2{overlap.x, 0.0f});
-            if (move_pc->getVelocity().x < 0.0f) { move_pc->setVelocityX(0.0f); }
+            if (move_pc->getVelocity().x < 0.0f) {
+                move_pc->setVelocityX(0.0f);
+                move_pc->setCollidedLeft(true);
+            }
         }
     } else {
         if (move_center.y < solid_center.y) {
             // 移动物体在上侧；
             move_tc->translate(glm::vec2{0.0f, -overlap.y});
-            if (move_pc->getVelocity().y > 0.0f) { move_pc->setVelocityY(0.0f); }
+            if (move_pc->getVelocity().y < 0.0f) {
+                move_pc->setVelocityY(0.0f);
+                move_pc->setCollidedBelow(true);
+            }
         } else {
             move_tc->translate(glm::vec2{0.0f, overlap.y});
-            if (move_pc->getVelocity().y < 0.0f) { move_pc->setVelocityY(0.0f); }
+            if (move_pc->getVelocity().y < 0.0f) {
+                move_pc->setVelocityY(0.0f);
+                move_pc->setCollidedAbove(true);
+            }
         }
     }
 }
@@ -220,18 +240,21 @@ void PhysicsEngine::applyWorldBounds(engine::component::PhysicsComponent& pc) {
     if (obj_pos.x < world_bounds_->position.x) {
         pc.setVelocityX(0.0f);
         obj_pos.x = world_bounds_->position.x;
+        pc.setCollidedLeft(true);
     }
 
     // 检查上边界
     if (obj_pos.y < world_bounds_->position.y) {
         pc.setVelocityY(0.0f);
         obj_pos.y = world_bounds_->position.y;
+        pc.setCollidedAbove(true);
     }
 
     // 检查右边界；
     if (obj_pos.x > world_bounds_->position.x + world_bounds_->size.x) {
         pc.setVelocityX(0.0f);
         obj_pos.x = world_bounds_->position.x + world_bounds_->size.x;
+        pc.setCollidedRight(true);
     }
 
     // 更新物体位置
@@ -264,6 +287,8 @@ void PhysicsEngine::update(const std::chrono::milliseconds& dt) {
     // 遍历所有注册的物理组件
     for (const auto& component: components_) {
         if (!component->isEnabled()) { continue; }
+
+        component->resetCollisionFlags();
 
         float dt_s = std::chrono::duration<float>(dt).count();
         // 应用重力；  v -= g * t;

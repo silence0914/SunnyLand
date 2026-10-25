@@ -96,6 +96,18 @@ add_executable(${TARGET}
         src/engine/physics/circleCollider.h
         src/engine/physics/collision.cpp
         src/engine/physics/collision.h
+        src/game/component/player_component.cpp
+        src/game/component/player_component.h
+        src/game/component/state/player_state.h
+        src/game/component/state/idle_state.cpp
+        src/game/component/state/idle_state.h
+        src/game/component/state/jump_state.cpp
+        src/game/component/state/jump_state.h
+        src/game/component/state/walk_state.cpp
+        src/game/component/state/walk_state.h
+        src/game/component/state/fall_state.cpp
+        src/game/component/state/fall_state.h
+
 )
 
 # 链接库

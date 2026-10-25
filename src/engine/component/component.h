@@ -42,9 +42,9 @@ protected:
 
 protected:
     virtual void init() {} //初始化
-    virtual void handleInput(engine::core::Context& context) {} // 输入处理
+    virtual void handleInput(engine::core::Context&) {} // 输入处理
     virtual void update(const std::chrono::milliseconds& ,engine::core::Context&) {} // 更新
-    virtual void render(engine::core::Context& context) {} // 渲染
+    virtual void render(engine::core::Context&) {} // 渲染
     virtual void clear() {} // 清理
 };
 } // component
