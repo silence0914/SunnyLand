@@ -43,8 +43,8 @@ public:
 
     void setOffset(const glm::vec2& offset) { offset_ = offset; }                     // 设置碰撞盒偏移量；
     void setAlignment(engine::utils::Alignment alignment) { alignment_ = alignment; } // 设置碰撞盒对齐方式
-    void setIsTrigger(bool is_trigger) { is_trigger_ = is_trigger; }                  // 设置是否为触发器
-    void setIsActive(bool is_active) { is_active_ = is_active; }                      // 设置是否激活
+    void setTrigger(bool is_trigger) { is_trigger_ = is_trigger; }                  // 设置是否为触发器
+    void setActive(bool is_active) { is_active_ = is_active; }                      // 设置是否激活
 
 private:
     engine::component::TransformComponent* transform_{nullptr};

@@ -55,6 +55,7 @@ void GameScene::init() {
 }
 
 void GameScene::handleInput() {
+    testHealth();
     Scene::handleInput();
 }
 
@@ -161,6 +162,13 @@ bool GameScene::initEnemyAndItem() {
         }
     }
     return success;
+}
+
+void GameScene::testHealth() {
+    auto input_manager = context_.getInputManager();
+    if (input_manager.isActionPressed(std::string{engine::utils::action::ATTACK})) {
+        player_->getComponent<game::component::PlayerComponent>()->takeDamage(1);
+    }
 }
 } // scene
 // game

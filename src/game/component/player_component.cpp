@@ -11,10 +11,28 @@
 #include "../../engine/component/physics_component.h"
 #include "../../engine/component/sprite_component.h"
 #include "../../engine/component/animation_component.h"
+#include "../../engine/component/health_component.h"
+#include "state/dead_state.h"
+#include "state/hurt_state.h"
 #include "state/idle_state.h"
 
 namespace game {
 namespace component {
+bool PlayerComponent::takeDamage(int damage) {
+    if (is_dead_ || damage < 1) { return false; }
+    if (!health_component_->takeDamage(damage)) { return false; }
+    spdlog::info("hp = {}",health_component_->getCurrentHealth());
+    if (health_component_->isAlive()) {
+        // 没死亡  进入硬直；
+        setState(std::make_unique<game::component::state::HurtState>(*this));
+    } else {
+        // 已经死亡  切换到死亡状态；
+        is_dead_ = true;
+        setState(std::make_unique<game::component::state::DeadState>(*this));
+    }
+    return true;
+}
+
 void PlayerComponent::setState(std::unique_ptr<game::component::state::PlayerState> new_state) {
     if (!new_state) { return; }
     if (current_state_) { current_state_->exit(); }
@@ -33,6 +51,7 @@ void PlayerComponent::init() {
     physics_component_ = owner_->getComponent<engine::component::PhysicsComponent>();
     sprite_component_ = owner_->getComponent<engine::component::SpriteComponent>();
     animation_component_ = owner_->getComponent<engine::component::AnimationComponent>();
+    health_component_ = owner_->getComponent<engine::component::HealthComponent>();
 
     // 初始化 状态机
     current_state_ = std::make_unique<game::component::state::IdleState>(*this);

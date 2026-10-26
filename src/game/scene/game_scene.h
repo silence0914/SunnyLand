@@ -33,6 +33,9 @@ private:
     [[nodiscard]] bool initPlayer();
     [[nodiscard]] bool initEnemyAndItem();
 
+    // 测试
+    void testHealth();
+
 
 private:
     engine::object::GameObject* player_{nullptr};

@@ -19,6 +19,7 @@
 
 #include "../component/animation_component.h"
 #include "../component/collider_component.h"
+#include "../component/health_component.h"
 #include "../component/physics_component.h"
 #include "../component/sprite_component.h"
 #include "../core/context.h"
@@ -270,6 +271,11 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
             }
             auto* ac = game_object->addComponent<engine::component::AnimationComponent>();
             addAnimation(anim_json, *ac, src_size);
+        }
+
+        auto health = getTileProperty<int>(tile_json.value(), "health");
+        if (health) {
+            game_object->addComponent<engine::component::HealthComponent>(health.value());
         }
 
         scene.addGameObject(std::move(game_object)); // 设置标签
