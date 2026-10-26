@@ -16,7 +16,7 @@ namespace game {
 namespace component {
 namespace state {
 void FallState::enter() {
-    // playAnimation("fall");
+    playAnimation("fall");
 }
 
 void FallState::exit() {}

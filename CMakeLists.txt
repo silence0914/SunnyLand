@@ -107,6 +107,11 @@ add_executable(${TARGET}
         src/game/component/state/walk_state.h
         src/game/component/state/fall_state.cpp
         src/game/component/state/fall_state.h
+        src/engine/component/animation_component.cpp
+        src/engine/component/animation_component.h
+        src/engine/render/animation.cpp
+        src/engine/render/animation.h
+        src/game/component/state/player_state.cpp
 
 )
 

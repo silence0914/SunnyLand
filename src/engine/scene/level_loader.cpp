@@ -17,11 +17,13 @@
 #include "../object/game_object.h"
 #include <memory>
 
+#include "../component/animation_component.h"
 #include "../component/collider_component.h"
 #include "../component/physics_component.h"
 #include "../component/sprite_component.h"
 #include "../core/context.h"
 #include "../physics/aabb_collider.h"
+#include "../render/animation.h"
 
 namespace engine {
 namespace scene {
@@ -61,6 +63,10 @@ constexpr static std::string_view TAG{"tag"};
 constexpr static std::string_view GRAVITY{"gravity"};
 static std::string SLOPE{"slope"};
 constexpr static std::string_view UNISOLID{"unisolid"};
+constexpr static std::string_view DURATION{"duration"};
+constexpr static std::string_view ROW{"row"};
+constexpr static std::string_view FRAMES{"frames"};
+constexpr static std::string_view ANIMATION{"animation"};
 
 
 bool LevelLoader::loadLevel(const std::string& map_path, Scene& scene) {
@@ -252,8 +258,66 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
             }
         }
 
+        // 获取并设置动画
+        auto anim_string = getTileProperty<std::string>(tile_json.value(), std::string{ANIMATION});
+        if (anim_string) {
+            nlohmann::json anim_json;
+            try {
+                anim_json = nlohmann::json::parse(anim_string.value());
+            } catch (const nlohmann::json::parse_error& e) {
+                mylog::MyLog{}.error("parse anim_string error: {}", e.what());
+                continue;
+            }
+            auto* ac = game_object->addComponent<engine::component::AnimationComponent>();
+            addAnimation(anim_json, *ac, src_size);
+        }
+
         scene.addGameObject(std::move(game_object)); // 设置标签
         mylog::MyLog{}.info("load Object {} success", object_name);
+    }
+}
+
+void LevelLoader::addAnimation(const nlohmann::json& anim_json, engine::component::AnimationComponent& ac,
+                               const glm::vec2& sprite_size) {
+    if (!anim_json.is_object()) {
+        mylog::MyLog{}.error("anim_json is not object");
+        return;
+    }
+    for (const auto& anim: anim_json.items()) {
+        const std::string& anim_name = anim.key();
+        const auto& anim_info = anim.value();
+        if (!anim_info.is_object()) {
+            mylog::MyLog{}.warn("anim_info is not object");
+            continue;
+        }
+
+        auto duration_ms = anim_info.value(DURATION, 100);         // 获取持续时间； 默认100ms
+        auto duration = static_cast<float>(duration_ms) / 1000.0f; // 转换成秒；
+        auto row = anim_info.value(ROW, 0);                        // 获取行数；
+
+        if (!anim_info.contains(FRAMES) || !anim_info[FRAMES].is_array()) {
+            mylog::MyLog{}.warn("anim_info '{}' is not array", anim_name);
+            continue;
+        }
+
+        auto animation = std::make_unique<engine::render::Animation>(anim_name);
+        for (const auto& frame: anim_info[FRAMES]) {
+            if (!frame.is_number_integer()) {
+                mylog::MyLog{}.warn("frame is not number_integer");
+                continue;
+            }
+            auto column = frame.get<int>();
+            // 计算源矩形；
+            SDL_FRect src_rect = {
+                column * sprite_size.x,
+                row * sprite_size.y,
+                sprite_size.x,
+                sprite_size.y
+            };
+            // 添加动画帧
+            animation->addFrame(src_rect, duration);
+        }
+        ac.addAnimation(std::move(animation));
     }
 }
 
@@ -395,12 +459,12 @@ engine::component::TileType LevelLoader::getTileType(const nlohmann::json& tile_
             return is_solid ? engine::component::TileType::SOLID : engine::component::TileType::NORMAL;
         } else if (property_name == SLOPE) {
             auto slope_type = property.value(VALUE, "");
-            if (SLOPE == "0_1")return engine::component::TileType::SLOPE_0_1;
-            else if (SLOPE == "1_0")return engine::component::TileType::SLOPE_1_0;
-            else if (SLOPE == "0_2")return engine::component::TileType::SLOPE_0_2;
-            else if (SLOPE == "2_0") return engine::component::TileType::SLOPE_2_0;
-            else if (SLOPE == "1_2") return engine::component::TileType::SLOPE_1_2;
-            else if (SLOPE == "2_1") return engine::component::TileType::SLOPE_2_1;
+            if (slope_type == "0_1")return engine::component::TileType::SLOPE_0_1;
+            else if (slope_type == "1_0")return engine::component::TileType::SLOPE_1_0;
+            else if (slope_type == "0_2")return engine::component::TileType::SLOPE_0_2;
+            else if (slope_type == "2_0") return engine::component::TileType::SLOPE_2_0;
+            else if (slope_type == "1_2") return engine::component::TileType::SLOPE_1_2;
+            else if (slope_type == "2_1") return engine::component::TileType::SLOPE_2_1;
             else {
                 spdlog::error("unknown slope type;type = {}", slope_type);
                 return engine::component::TileType::NORMAL;
@@ -410,6 +474,7 @@ engine::component::TileType LevelLoader::getTileType(const nlohmann::json& tile_
             return is_unisolid ? engine::component::TileType::UNISOLID : engine::component::TileType::NORMAL;
         }
     }
+    return engine::component::TileType::NORMAL;
 }
 
 engine::component::TileType LevelLoader::getTileTypeById(const nlohmann::json& tileset_json, int local_id) {
@@ -420,6 +485,7 @@ engine::component::TileType LevelLoader::getTileTypeById(const nlohmann::json& t
             return getTileType(tile);
         }
     }
+    return engine::component::TileType::NORMAL;
 }
 } // scene
 } // engine

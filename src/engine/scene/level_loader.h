@@ -14,6 +14,7 @@
 #include "../utils/math.h"
 
 namespace engine::component {
+class AnimationComponent;
 struct TileInfo;
 enum class TileType;
 }
@@ -29,9 +30,18 @@ public:
     bool loadLevel(const std::string& map_path, Scene& scene);
 
 private:
-    void loadImageLayer(const nlohmann::json& layer_json, Scene& scene);
-    void loadTileLayer(const nlohmann::json& layer_json, Scene& scene);
-    void loadObjectLayer(const nlohmann::json& layer_json, Scene& scene);
+    void loadImageLayer(const nlohmann::json& layer_json, Scene& scene);  // 加载图片层
+    void loadTileLayer(const nlohmann::json& layer_json, Scene& scene);   // 加载瓦片层
+    void loadObjectLayer(const nlohmann::json& layer_json, Scene& scene); // 加载对象层
+
+    /**
+     * @brief 添加动画到指定的AnimationComponent;
+     * @param anim_json 动画的json数据；
+     * @param ac AnimationComponent 指针；
+     * @param sprite_size 每帧动画的尺寸；
+     */
+    void addAnimation(const nlohmann::json& anim_json, engine::component::AnimationComponent& ac,
+                      const glm::vec2& sprite_size);
 
     /**
      * @brief 获取瓦片属性；

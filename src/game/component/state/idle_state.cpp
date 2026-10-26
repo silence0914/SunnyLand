@@ -16,7 +16,7 @@ namespace game {
 namespace component {
 namespace state {
 void IdleState::enter() {
-    // playAnimation("idle");
+    playAnimation("idle");
 }
 void IdleState::exit() {}
 

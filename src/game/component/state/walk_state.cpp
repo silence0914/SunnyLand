@@ -9,11 +9,15 @@
 #include "../player_component.h"
 #include "../../../engine/core/context.h"
 #include "../../../engine/input/input_manager.h"
+#include "../../../engine/component/physics_component.h"
 
 namespace game {
 namespace component {
 namespace state {
-void WalkState::enter() {}
+void WalkState::enter() {
+    playAnimation("walk");
+}
+
 void WalkState::exit() {}
 
 std::unique_ptr<PlayerState> WalkState::handleInput(engine::core::Context& context) {

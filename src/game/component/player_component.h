@@ -14,6 +14,7 @@ namespace engine::component {
 class PhysicsComponent;
 class SpriteComponent;
 class TransformComponent;
+class AnimationComponent;
 }
 
 namespace game {
@@ -35,6 +36,7 @@ public:
     [[nodiscard]] engine::component::TransformComponent& getTransformComponent() const { return *transform_component_; }
     [[nodiscard]] engine::component::SpriteComponent& getSpriteComponent() const { return *sprite_component_; }
     [[nodiscard]] engine::component::PhysicsComponent& getPhysicsComponent() const { return *physics_component_; }
+    [[nodiscard]] engine::component::AnimationComponent& getAnimationComponent() const { return *animation_component_; }
     [[nodiscard]] bool isIsDead() const { return is_dead_; }                   // 是否死亡
     [[nodiscard]] float getMoveForce() const { return move_force_; }           // 水平移动力
     [[nodiscard]] float getMaxSpeed() const { return max_speed_; }             // 最大移动速度
@@ -57,6 +59,7 @@ private:
     engine::component::TransformComponent* transform_component_;
     engine::component::SpriteComponent* sprite_component_;
     engine::component::PhysicsComponent* physics_component_;
+    engine::component::AnimationComponent* animation_component_;
 
     std::unique_ptr<game::component::state::PlayerState> current_state_; // 当前状态
     bool is_dead_{false};                                                // 是否死亡
