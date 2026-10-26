@@ -18,7 +18,7 @@ void GameObject::handleInput(engine::core::Context& context) {
     }
 }
 
-void GameObject::update(const std::chrono::milliseconds& dt, engine::core::Context& context) {
+void GameObject::update(const float dt, engine::core::Context& context) {
     // 遍历更新全部组件
     for (const auto& component: components_) {
         component.second->update(dt, context);

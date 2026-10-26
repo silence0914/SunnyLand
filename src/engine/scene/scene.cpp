@@ -33,7 +33,7 @@ void Scene::handleInput() {
     }
 }
 
-void Scene::update(const std::chrono::milliseconds& dt) {
+void Scene::update(const float dt) {
     if (!is_initialized_) { return; }
 
     // 先更新物理引擎；

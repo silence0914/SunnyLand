@@ -39,7 +39,7 @@ void GameApp::Run() {
         time_->update();
         input_manager_->update();
         handleEvents();
-        update(time_->getDeltaTime());
+        update(std::chrono::duration<float>(time_->getDeltaTime()).count());
         render();
     }
     close();
@@ -81,7 +81,7 @@ void GameApp::handleEvents() {
     scene_manager_->handelInput();
 }
 
-void GameApp::update(const std::chrono::milliseconds& dt) {
+void GameApp::update(const float dt) {
     scene_manager_->update(dt);
 }
 

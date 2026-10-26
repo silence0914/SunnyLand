@@ -24,13 +24,15 @@ public:
     // 核心循环；
     void init() override;
     void handleInput() override;
-    void update(const std::chrono::milliseconds& dt) override;
+    void update(float dt) override;
     void render() override;
     void clean() override;
 
 private:
     [[nodiscard]] bool initLevel();
     [[nodiscard]] bool initPlayer();
+    [[nodiscard]] bool initEnemyAndItem();
+
 
 private:
     engine::object::GameObject* player_{nullptr};

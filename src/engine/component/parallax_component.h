@@ -43,7 +43,7 @@ public:
 protected:
     void init() override;
     void render(engine::core::Context& context) override;
-    void update(const std::chrono::milliseconds&, engine::core::Context&) override {};
+    void update(const float, engine::core::Context&) override {};
 
 private:
     engine::component::TransformComponent* transform_; // 位置变换组件；

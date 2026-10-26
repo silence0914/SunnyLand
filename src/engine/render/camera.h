@@ -23,7 +23,7 @@ public:
     explicit Camera(const glm::vec2& viewport_size, const glm::vec2& position = glm::vec2{0.0f, 0.0f},
                     const std::optional<engine::utils::Rect>& limit_bounds = std::nullopt);
 
-    void update(const std::chrono::milliseconds& dt); // 更新相机位置；
+    void update(float dt); // 更新相机位置；
     void move(const glm::vec2& offset);               // 移动相机位置;
 
     [[nodiscard]] glm::vec2 worldToScreen(const glm::vec2& world_pos) const; // 世界坐标转屏幕坐标；

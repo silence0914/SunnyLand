@@ -38,6 +38,14 @@ void SpriteComponent::setSpriteById(const std::string& texture_id, const std::op
     sprite_.setTextureId(texture_id);
     sprite_.setSourceRect(source_rect);
 
+    updateSpriteSize();
+    updateOffset();
+}
+
+void SpriteComponent::setSourceRect(const std::optional<SDL_FRect>& source_rect) {
+    sprite_.setSourceRect(source_rect);
+
+    updateSpriteSize();
     updateOffset();
 }
 

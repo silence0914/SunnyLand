@@ -16,6 +16,7 @@ namespace game {
 namespace component {
 namespace state {
 void JumpState::enter() {
+    // playAnimation("jump");
     auto& physics_component = player_component_.getPhysicsComponent();
     physics_component.setVelocityY(-player_component_.getJumpForce());
     mylog::MyLog{}.debug("playerComponent Jump;");
@@ -41,7 +42,7 @@ std::unique_ptr<PlayerState> JumpState::handleInput(engine::core::Context& conte
     return nullptr;
 }
 
-std::unique_ptr<PlayerState> JumpState::update(const std::chrono::milliseconds&, engine::core::Context&) {
+std::unique_ptr<PlayerState> JumpState::update(const float, engine::core::Context&) {
     // 限制最大速度
     auto& physics_component = player_component_.getPhysicsComponent();
     float max_speed = player_component_.getMaxSpeed();

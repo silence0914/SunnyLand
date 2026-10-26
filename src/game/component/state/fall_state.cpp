@@ -8,19 +8,21 @@
 #include "../player_component.h"
 #include "../../../engine/core/context.h"
 #include "../../../engine/input/input_manager.h"
+#include "../../../engine/utils/action.h"
+#include "../../../engine/component/physics_component.h"
+
 
 namespace game {
 namespace component {
 namespace state {
+void FallState::enter() {
+    // playAnimation("fall");
+}
 
-void FallState::enter() {}
 void FallState::exit() {}
 
 std::unique_ptr<PlayerState> FallState::handleInput(engine::core::Context& context) {
     auto& input_manager = context.getInputManager();
-    auto& physics_component = player_component_.getPhysicsComponent();
-    auto& sprite_component = player_component_.getSpriteComponent();
-
     // 下落状态  可以左右移动
     if (input_manager.isActionDown(std::string{engine::utils::action::MOVE_LEFT})) {
         moveLeft();
@@ -30,7 +32,7 @@ std::unique_ptr<PlayerState> FallState::handleInput(engine::core::Context& conte
     return nullptr;
 }
 
-std::unique_ptr<PlayerState> FallState::update(const std::chrono::milliseconds&, engine::core::Context&) {
+std::unique_ptr<PlayerState> FallState::update(const float, engine::core::Context&) {
     auto& physics_component = player_component_.getPhysicsComponent();
     auto max_speed = player_component_.getMaxSpeed();
     physics_component.setVelocityX(glm::clamp(physics_component.getVelocity().x, -max_speed, max_speed));

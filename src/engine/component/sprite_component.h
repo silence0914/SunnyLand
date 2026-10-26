@@ -19,6 +19,11 @@ namespace engine {
 namespace component {
 class TransformComponent;
 
+/**
+ * @brief 持有sprite对象 管理GameObject 的视觉表示
+ *
+ * 协调sprite 数据和渲染逻辑  与TransformComponent交互；
+ */
 class SpriteComponent final : public engine::component::Component {
     friend class engine::object::GameObject;
 
@@ -77,7 +82,7 @@ private:
     void updateSpriteSize(); // 根据sprite_ 的 source_size 更新 sprite_size;
 
     void init() override;
-    void update(const std::chrono::milliseconds&, engine::core::Context&) {};
+    void update(const float, engine::core::Context&) {};
     void render(engine::core::Context& context) override;
 
 private:

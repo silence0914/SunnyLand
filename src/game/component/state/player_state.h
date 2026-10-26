@@ -30,7 +30,7 @@ protected:
 
     // handleInput 和 update 返回值为下一个状态； 如果不需要切换状态， 返回nullptr;
     virtual std::unique_ptr<PlayerState> handleInput(engine::core::Context&) = 0;                              // 处理输入；
-    virtual std::unique_ptr<PlayerState> update(const std::chrono::milliseconds&, engine::core::Context&) = 0; // 更新；
+    virtual std::unique_ptr<PlayerState> update(const float, engine::core::Context&) = 0; // 更新；
 
     void moveLeft() const {
         auto& physics_component = player_component_.getPhysicsComponent();

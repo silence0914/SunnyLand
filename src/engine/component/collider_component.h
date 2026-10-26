@@ -56,7 +56,7 @@ private:
 
 private:
     void init() override;
-    void update(const std::chrono::milliseconds&, engine::core::Context&) override {};
+    void update(const float, engine::core::Context&) override {};
 };
 } // component
 } // engine

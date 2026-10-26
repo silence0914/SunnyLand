@@ -281,7 +281,7 @@ float PhysicsEngine::getTileHeightWidth(float width, engine::component::TileType
     }
 }
 
-void PhysicsEngine::update(const std::chrono::milliseconds& dt) {
+void PhysicsEngine::update(const float dt) {
     // 清空前一帧的碰撞对；
     collision_pairs_.clear();
     // 遍历所有注册的物理组件
@@ -290,18 +290,17 @@ void PhysicsEngine::update(const std::chrono::milliseconds& dt) {
 
         component->resetCollisionFlags();
 
-        float dt_s = std::chrono::duration<float>(dt).count();
         // 应用重力；  v -= g * t;
         if (component->isUseGravity()) {
-            glm::vec2 g{gravity_ * dt_s};
+            glm::vec2 g{gravity_ * dt};
             component->addVelocity(g);
         }
         // 更新速度； v += a * dt; a = F / m;
-        auto velocity = (component->getForce() / component->getMass()) * dt_s;
+        auto velocity = (component->getForce() / component->getMass()) * dt;
         component->addVelocity(velocity);
         component->clearForce();
 
-        resolveTileCollisions(*component, dt_s);
+        resolveTileCollisions(*component, dt);
 
         applyWorldBounds(*component);
     }

@@ -4,11 +4,13 @@
 
 #include "game_scene.h"
 
+#include "../../engine/object/game_object.h"
 #include "../../engine/component/collider_component.h"
 #include "../../engine/component/physics_component.h"
-#include "../../engine/object/game_object.h"
 #include "../../engine/component/sprite_component.h"
 #include "../../engine/component/transform_component.h"
+// #include "../../engine/component/animation_component.h"
+#include "../../engine/component/tilelayer_component.h"
 #include "../../engine/core/context.h"
 #include "../../engine/input/input_manager.h"
 #include "../../engine/log/log_manager.h"
@@ -18,8 +20,8 @@
 #include "../../engine/render/camera.h"
 #include "../../engine/scene/level_loader.h"
 #include "../../engine/utils/action.h"
-#include "../../engine/component/tilelayer_component.h"
 #include "../component/state/player_state.h"
+#include "../component/player_component.h"
 
 namespace game::scene {
 GameScene::GameScene(std::string name, engine::core::Context& context, engine::scene::SceneManager& scene_manager)
@@ -42,6 +44,12 @@ void GameScene::init() {
         render();
     }
 
+    if (!initEnemyAndItem()) {
+        mylog::MyLog{}.error("enemy and item init failed");
+        context_.getInputManager().setShouldQuit(true);
+        render();
+    }
+
     Scene::init();
     mylog::MyLog{}.trace("init success");
 }
@@ -50,7 +58,7 @@ void GameScene::handleInput() {
     Scene::handleInput();
 }
 
-void GameScene::update(const std::chrono::milliseconds& dt) {
+void GameScene::update(const float dt) {
     Scene::update(dt);
 }
 
@@ -115,6 +123,44 @@ bool GameScene::initPlayer() {
     context_.getCamera().setTarget(*player_transform);
     spdlog::trace("initPlayer success; scene_name = '{}'", scene_name_);
     return true;
+}
+
+bool GameScene::initEnemyAndItem() {
+    bool success = true;
+    // for (auto& game_object: game_objects_) {
+    //     if (game_object->getName() == "eagle") {
+    //         if (auto* ac = game_object->getComponent<engine::component::AnimationComponent>(); ac) {
+    //             ac->playAnimation("fly");
+    //         } else {
+    //             mylog::MyLog{}.error("'{}' initEnemyAndItem failed;findAnimationComponent failed;", scene_name_);
+    //             success = false;
+    //         }
+    //     }
+    //     if (game_object->getName() == "frog") {
+    //         if (auto* ac = game_object->getComponent<engine::component::AnimationComponent>(); ac) {
+    //             ac->playAnimation("idle");
+    //         } else {
+    //             success = false;
+    //         }
+    //     }
+    //     if (game_object->getName() == "opossum") {
+    //         if (auto* ac = game_object->getComponent<engine::component::AnimationComponent>(); ac) {
+    //             ac->playAnimation("walk");
+    //         } else {
+    //             spdlog::error("Opossum对象缺少 AnimationComponent，无法播放动画。");
+    //             success = false;
+    //         }
+    //     }
+    //     if (game_object->getTag() == "item") {
+    //         if (auto* ac = game_object->getComponent<engine::component::AnimationComponent>(); ac) {
+    //             ac->playAnimation("idle");
+    //         } else {
+    //             spdlog::error("Item对象缺少 AnimationComponent，无法播放动画。");
+    //             success = false;
+    //         }
+    //     }
+    // }
+    return success;
 }
 } // scene
 // game

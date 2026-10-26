@@ -45,7 +45,7 @@ public:
 
     virtual void init();
     virtual void handleInput();
-    virtual void update(const std::chrono::milliseconds& dt);
+    virtual void update(float dt);
     virtual void render();
     virtual void clean();
 

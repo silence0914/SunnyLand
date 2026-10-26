@@ -56,7 +56,7 @@ public:
 private:
     [[nodiscard]] bool init();
     void handleEvents();
-    void update(const std::chrono::milliseconds& dt);
+    void update(float dt);
     void render();
     void close();
 

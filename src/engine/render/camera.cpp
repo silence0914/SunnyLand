@@ -17,7 +17,7 @@ Camera::Camera(const glm::vec2& viewport_size, const glm::vec2& position,
     spdlog::trace("create Camera success");
 }
 
-void Camera::update(const std::chrono::milliseconds& dt) {
+void Camera::update(const float dt) {
     if (target_ == nullptr) { return; }
     glm::vec2 target_pos = target_->getPosition();
     glm::vec2 desired_position = target_pos - viewport_size_ / 2.0f; // 计算目标位置 使目标处于视口中心；
@@ -26,7 +26,7 @@ void Camera::update(const std::chrono::milliseconds& dt) {
     if (distance < SNAP_THRESHOLD) {
         position_ = desired_position;
     } else {
-        position_ = glm::mix(position_, desired_position, smooth_speed * std::chrono::duration<float>(dt).count());
+        position_ = glm::mix(position_, desired_position, smooth_speed * dt);
         position_ = glm::vec2(glm::round(position_.x), glm::round(position_.y)); // 四舍五入到整数；
     }
     clampPosition();

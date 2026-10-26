@@ -43,7 +43,7 @@ private:
     float rotation_{0.0f}; // 旋转
 
 private:
-    void update(const std::chrono::milliseconds&, engine::core::Context&) override {};
+    void update(const float, engine::core::Context&) override {};
 };
 } // component
 } // engine

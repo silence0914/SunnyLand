@@ -37,7 +37,7 @@ public:
     void unregisterCollisionLayer(engine::component::TileLayerComponent& layer); // 注销用于碰撞检测的TileLayerComponent;
 
 
-    void update(const std::chrono::milliseconds& dt); // 核心循环， 更新所有注册的物理组件
+    void update(float dt); // 核心循环， 更新所有注册的物理组件
 
     // get/set
     [[nodiscard]] glm::vec2 getGravity() const { return gravity_; }                                   // 获取当前全局重力

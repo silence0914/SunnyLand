@@ -41,7 +41,7 @@ public:
 
     // 循环组件；
     void handleInput(engine::core::Context& context);                                 // 处理输入
-    void update(const std::chrono::milliseconds& dt, engine::core::Context& context); // 更新所有组件
+    void update(float dt, engine::core::Context& context); // 更新所有组件
     void render(engine::core::Context& context);                                      // 渲染所有组件
 
     void clear(); // 清理组件

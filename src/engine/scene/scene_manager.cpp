@@ -25,7 +25,7 @@ void SceneManager::handelInput() {
     }
 }
 
-void SceneManager::update(const std::chrono::milliseconds& dt) {
+void SceneManager::update(const float dt) {
     auto scene = getCurrentScene();
     if (scene) {
         scene->update(dt);

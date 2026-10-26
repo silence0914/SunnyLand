@@ -34,7 +34,7 @@ public:
 
     // 循环
     void handelInput();
-    void update(const std::chrono::milliseconds& dt);
+    void update(float dt);
     void render();
 
     void close();

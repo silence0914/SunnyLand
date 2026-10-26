@@ -15,7 +15,9 @@
 namespace game {
 namespace component {
 namespace state {
-void IdleState::enter() {}
+void IdleState::enter() {
+    // playAnimation("idle");
+}
 void IdleState::exit() {}
 
 std::unique_ptr<PlayerState> IdleState::handleInput(engine::core::Context& context) {
@@ -31,7 +33,7 @@ std::unique_ptr<PlayerState> IdleState::handleInput(engine::core::Context& conte
     return nullptr;
 }
 
-std::unique_ptr<PlayerState> IdleState::update(const std::chrono::milliseconds&, engine::core::Context&) {
+std::unique_ptr<PlayerState> IdleState::update(const float, engine::core::Context&) {
     auto& physics_component = player_component_.getPhysicsComponent();
     auto friction_factor = player_component_.getFrictionFactor();
     physics_component.setVelocityX(physics_component.getVelocity().x * friction_factor);

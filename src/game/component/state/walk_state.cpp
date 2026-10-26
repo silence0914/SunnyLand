@@ -35,7 +35,7 @@ std::unique_ptr<PlayerState> WalkState::handleInput(engine::core::Context& conte
     return nullptr;
 }
 
-std::unique_ptr<PlayerState> WalkState::update(const std::chrono::milliseconds&, engine::core::Context&) {
+std::unique_ptr<PlayerState> WalkState::update(const float, engine::core::Context&) {
     // 限制最大速度；
     auto& physics_component = player_component_.getPhysicsComponent();
     float max_speed = player_component_.getMaxSpeed();

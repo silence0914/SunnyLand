@@ -47,7 +47,7 @@ void PlayerComponent::handleInput(engine::core::Context& context) {
     if (next_state) { setState(std::move(next_state)); }
 }
 
-void PlayerComponent::update(const std::chrono::milliseconds& dt, engine::core::Context& context) {
+void PlayerComponent::update(const float dt, engine::core::Context& context) {
     if (!current_state_) { return; }
     auto next_state = current_state_->update(dt, context);
     if (next_state) { setState(std::move(next_state)); }
