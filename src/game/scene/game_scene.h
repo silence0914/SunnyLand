@@ -4,6 +4,8 @@
 
 #ifndef GAME_SCENE_H
 #define GAME_SCENE_H
+#include <glm/vec2.hpp>
+
 #include "../../engine/scene/scene.h"
 
 namespace engine::object {
@@ -33,9 +35,16 @@ private:
     [[nodiscard]] bool initPlayer();
     [[nodiscard]] bool initEnemyAndItem();
 
-    // 测试
-    void testHealth();
+    void handleObjectCollisions();                                                                      // 处理游戏对象间的碰撞
+    void playerVsEnemyCollision(engine::object::GameObject& player, engine::object::GameObject& enemy); // 玩家与敌人的碰撞
+    void playerVsItemCollision(engine::object::GameObject& player, engine::object::GameObject& item);   // 玩家与道具间碰撞；
 
+    /**
+     * @brief 创建一个特效对象；
+     * @param center_pos 特效中心位置；
+     * @param tag 特效标签
+     */
+    void createEffect(const glm::vec2& center_pos, const std::string& tag);
 
 private:
     engine::object::GameObject* player_{nullptr};

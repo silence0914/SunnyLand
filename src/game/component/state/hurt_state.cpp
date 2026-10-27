@@ -16,7 +16,7 @@ namespace component {
 namespace state {
 void HurtState::enter() {
     stunned_timer_ = 0;
-    playAnimation("Hurt");
+    playAnimation("hurt");
     auto& physics_component = player_component_.getPhysicsComponent();
     auto& sprite_component = player_component_.getSpriteComponent();
 

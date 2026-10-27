@@ -115,8 +115,8 @@ public:
     }
 
 private:
-    std::string name_;                                                                               // 名称
-    std::string tag_;                                                                                // 标签
+    std::string name_{};                                                                               // 名称
+    std::string tag_{};                                                                                // 标签
     std::unordered_map<std::type_index, std::unique_ptr<engine::component::Component> > components_; // 组件表
     bool need_remove_{false};                                                                        // 延迟删除标识；
 };

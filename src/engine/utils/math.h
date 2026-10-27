@@ -12,6 +12,8 @@ namespace engine::utils {
 struct Rect {
     glm::vec2 position;
     glm::vec2 size;
+
+    glm::vec2 getCenter() { return position + size / 2.0f; }
 };
 }
 

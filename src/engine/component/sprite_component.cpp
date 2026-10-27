@@ -112,23 +112,23 @@ void SpriteComponent::updateOffset() {
     auto& y = sprite_size_.y;
 
     switch (alignment_) {
-        case engine::utils::Alignment::TOP_LEFT: offset_ = {0, 0};
+        case engine::utils::Alignment::TOP_LEFT: offset_ = {0, 0} * scale;
             break;
-        case engine::utils::Alignment::TOP_CENTER: offset_ = {x / 2, 0};
+        case engine::utils::Alignment::TOP_CENTER: offset_ = {-x / 2, 0} * scale;
             break;
-        case engine::utils::Alignment::TOP_RIGHT: offset_ = {x, 0};
+        case engine::utils::Alignment::TOP_RIGHT: offset_ = {-x, 0} * scale;
             break;
-        case engine::utils::Alignment::CENTER_LEFT: offset_ = {0, y / 2};
+        case engine::utils::Alignment::CENTER_LEFT: offset_ = {0, -y / 2} * scale;
             break;
-        case engine::utils::Alignment::CENTER: offset_ = {x / 2, y / 2};
+        case engine::utils::Alignment::CENTER: offset_ = {-x / 2, -y / 2} * scale;
             break;
-        case engine::utils::Alignment::CENTER_RIGHT: offset_ = {x, y / 2};
+        case engine::utils::Alignment::CENTER_RIGHT: offset_ = {-x, -y / 2} * scale;
             break;
-        case engine::utils::Alignment::BOTTOM_LEFT: offset_ = {0, y};
+        case engine::utils::Alignment::BOTTOM_LEFT: offset_ = {0, -y} * scale;
             break;
-        case engine::utils::Alignment::BOTTOM_CENTER: offset_ = {x / 2, y};
+        case engine::utils::Alignment::BOTTOM_CENTER: offset_ = {-x / 2, -y} * scale;
             break;
-        case engine::utils::Alignment::BOTTOM_RIGHT: offset_ = {x, y};
+        case engine::utils::Alignment::BOTTOM_RIGHT: offset_ = {-x, -y} * scale;
             break;
         default:
             break;

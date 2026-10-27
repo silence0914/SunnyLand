@@ -36,12 +36,7 @@ void Scene::handleInput() {
 void Scene::update(const float dt) {
     if (!is_initialized_) { return; }
 
-    // 先更新物理引擎；
-    context_.getPhysicsEngine().update(dt);
-
-    // 更新相机
-    context_.getCamera().update(dt);
-
+    // 先删除无效对象；
     for (auto it = game_objects_.begin(); it != game_objects_.end();) {
         auto& game_object = *it;
         if (!game_object) {
@@ -54,9 +49,20 @@ void Scene::update(const float dt) {
             it = game_objects_.erase(it);
             break;
         }
-        game_object->update(dt, context_);
         ++it;
     }
+
+
+    // 更新物理引擎；
+    context_.getPhysicsEngine().update(dt);
+
+    // 更新相机
+    context_.getCamera().update(dt);
+
+    for (auto & object : game_objects_) {
+        object->update(dt,context_);
+    }
+
     processPendingAdditions();
 }
 
