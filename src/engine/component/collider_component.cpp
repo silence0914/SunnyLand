@@ -7,9 +7,11 @@
 #include <spdlog/spdlog.h>
 
 #include "transform_component.h"
+#include "../core/context.h"
 #include "../log/log_manager.h"
 #include "../log/my_log.h"
 #include "../object/game_object.h"
+#include "../render/renderer.h"
 #include "../utils/math.h"
 
 namespace engine {
@@ -90,6 +92,13 @@ void ColliderComponent::init() {
 
     updateOffset();
     Component::init();
+}
+
+void ColliderComponent::render(engine::core::Context& context) {
+    auto& render = context.getRenderer();
+    auto world_aabb = getWorldAABB();
+    render.setDrawColor(255, 255, 0);
+    render.drawRect(context.getCamera(), world_aabb.position, world_aabb.size);
 }
 } // component
 } // engine

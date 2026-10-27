@@ -9,14 +9,12 @@
 #include <nlohmann/json.hpp>
 
 #include "scene.h"
+#include <memory>
 #include "../component/parallax_component.h"
 #include "../component/transform_component.h"
 #include "../log/my_log.h"
 #include "../object/game_object.h"
 #include "../component/tilelayer_component.h"
-#include "../object/game_object.h"
-#include <memory>
-
 #include "../component/animation_component.h"
 #include "../component/collider_component.h"
 #include "../component/health_component.h"
@@ -238,20 +236,22 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
         } else if (auto rect = getColliderRect(tile_json.value()); rect) {
             auto collider = std::make_unique<engine::physics::AABBCollider>(rect->size);
             // 添加物理组件  组件不受重力影响；
-            engine::component::ColliderComponent* cc = game_object->addComponent<
-                engine::component::ColliderComponent>(std::move(collider));
+            auto* cc = game_object->addComponent<engine::component::ColliderComponent>(std::move(collider));
             cc->setOffset(rect->position);
             game_object->addComponent<engine::component::PhysicsComponent>(scene.getContext().getPhysicsEngine(),
                                                                            false);
         }
-        auto tag = getTileProperty<std::string>(tile_json.value(), std::string{TAG});
-        if (tag.has_value()) { game_object->setTag(tag.value()); }
+
+        // todo;
+        if (auto tag = getTileProperty<std::string>(tile_json.value(), std::string{TAG})) {
+            game_object->setTag(tag.value());
+        } else if (tile_info.type == engine::component::TileType::HAZARD) {
+            game_object->setTag("hazard");
+        }
 
         // 获取并设置重力信息
-        auto gravity = getTileProperty<bool>(tile_json.value(), std::string{GRAVITY});
-        if (gravity) {
-            engine::component::PhysicsComponent* pc = game_object->getComponent<engine::component::PhysicsComponent>();
-            if (pc) {
+        if (auto gravity = getTileProperty<bool>(tile_json.value(), std::string{GRAVITY})) {
+            if (auto* pc = game_object->getComponent<engine::component::PhysicsComponent>()) {
                 pc->setUseGravity(gravity.value());
             } else {
                 game_object->addComponent<engine::component::PhysicsComponent>(scene.getContext().getPhysicsEngine(),
@@ -260,8 +260,7 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
         }
 
         // 获取并设置动画
-        auto anim_string = getTileProperty<std::string>(tile_json.value(), std::string{ANIMATION});
-        if (anim_string) {
+        if (auto anim_string = getTileProperty<std::string>(tile_json.value(), std::string{ANIMATION})) {
             nlohmann::json anim_json;
             try {
                 anim_json = nlohmann::json::parse(anim_string.value());
@@ -273,8 +272,7 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
             addAnimation(anim_json, *ac, src_size);
         }
 
-        auto health = getTileProperty<int>(tile_json.value(), "health");
-        if (health) {
+        if (auto health = getTileProperty<int>(tile_json.value(), "health")) {
             game_object->addComponent<engine::component::HealthComponent>(health.value());
         }
 
@@ -315,8 +313,8 @@ void LevelLoader::addAnimation(const nlohmann::json& anim_json, engine::componen
             auto column = frame.get<int>();
             // 计算源矩形；
             SDL_FRect src_rect = {
-                column * sprite_size.x,
-                row * sprite_size.y,
+                static_cast<float>(column) * sprite_size.x,
+                static_cast<float>(row) * sprite_size.y,
                 sprite_size.x,
                 sprite_size.y
             };
@@ -386,8 +384,8 @@ engine::component::TileInfo LevelLoader::getTileInfoByGid(int gid) {
         auto coordinate_x = local_id % tileset[COLUMNS].get<int>();
         auto coordinate_y = local_id / tileset[COLUMNS].get<int>();
         SDL_FRect texture_rect{
-            static_cast<float>(coordinate_x) * tile_size_.x,
-            static_cast<float>(coordinate_y) * tile_size_.y,
+            static_cast<float>(coordinate_x * tile_size_.x),
+            static_cast<float>(coordinate_y * tile_size_.y),
             static_cast<float>(tile_size_.x),
             static_cast<float>(tile_size_.y)
         };
@@ -401,8 +399,7 @@ engine::component::TileInfo LevelLoader::getTileInfoByGid(int gid) {
         }
         const auto& tiles_json = tileset[TILES];
         for (const auto& tile_json: tiles_json) {
-            auto tile_id = tile_json.value(ID, 0);
-            if (!(tile_id == local_id)) { continue; }
+            if (auto tile_id = tile_json.value(ID, 0); !(tile_id == local_id)) { continue; }
             if (!tile_json.contains(IMAGE)) {
                 mylog::MyLog{}.error("tile '{}' have no image;gid = {}", tileset_it->first, gid);
                 return engine::component::TileInfo();
@@ -478,6 +475,9 @@ engine::component::TileType LevelLoader::getTileType(const nlohmann::json& tile_
         } else if (property_name == UNISOLID.data()) {
             auto is_unisolid = property.value(VALUE, false);
             return is_unisolid ? engine::component::TileType::UNISOLID : engine::component::TileType::NORMAL;
+        } else if (property_name == "hazard") {
+            auto is_hazard = property.value(VALUE, false);
+            return is_hazard ? engine::component::TileType::HAZARD : engine::component::TileType::NORMAL;
         }
     }
     return engine::component::TileType::NORMAL;

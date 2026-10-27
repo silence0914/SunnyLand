@@ -36,7 +36,6 @@ public:
     void registerCollisionLayer(engine::component::TileLayerComponent& layer);   // 注册用于碰撞检测的TileLayerComponent;
     void unregisterCollisionLayer(engine::component::TileLayerComponent& layer); // 注销用于碰撞检测的TileLayerComponent;
 
-
     void update(float dt); // 核心循环， 更新所有注册的物理组件
 
     // get/set
@@ -54,6 +53,13 @@ public:
         return collision_pairs_;
     }
 
+    [[nodiscard]] std::vector<std::pair<engine::object::GameObject*, engine::component::TileType> >
+    getTileTriggerEvent() const {
+        return tile_trigger_event;
+    }
+
+    utils::Rect playerIntersectTile{};
+
 private:
     void checkObjectCollisions();                                                  // 检测对象碰撞 并记录；
     void resolveTileCollisions(engine::component::PhysicsComponent& pc, float dt); // 检测并处理游戏对象与瓦片间的碰撞；
@@ -67,6 +73,7 @@ private:
      * @return
      */
     float getTileHeightWidth(float width, engine::component::TileType type, glm::vec2 tile_size);
+    void checkTileTriggers(); // 检测所有游戏对象与瓦片层陷阱瓦片碰撞并记录触发事件；
 
 private:
     std::vector<engine::component::PhysicsComponent*> components_;              // 注册的物理组件容器 非拥有指针；
@@ -77,6 +84,9 @@ private:
 
     // 储存本帧发生的GameObject碰撞对；每次update开始清空；
     std::vector<std::pair<engine::object::GameObject*, engine::object::GameObject*> > collision_pairs_;
+
+    // 储存本帧发生的瓦片触发事件；
+    std::vector<std::pair<engine::object::GameObject*, engine::component::TileType> > tile_trigger_event;
 };
 } // physics
 } // engine

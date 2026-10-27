@@ -143,6 +143,23 @@ void Renderer::drawUISprite(const Sprite& sprite, const glm::vec2& position, con
     }
 }
 
+void Renderer::drawRect(const engine::render::Camera& camera, const glm::vec2& world_pos, const glm::vec2& size) {
+    auto pos = camera.worldToScreen(world_pos);
+    SDL_FRect rect{pos.x, pos.y, size.x, size.y};
+    if (!SDL_RenderRect(renderer_, &rect)) {
+        spdlog::error("drawCollider failed; SDL_RenderRect failed; sdl_error = {}", SDL_GetError());
+    }
+}
+
+void Renderer::drawRect(const engine::render::Camera& camera, const glm::vec2& world_pos, const Sprite& sprite) {
+    auto pos = camera.worldToScreen(world_pos);
+    auto size = getSpriteSrcRect(sprite);
+    SDL_FRect rect{pos.x, pos.y, size->w, size->h};
+    if (!SDL_RenderRect(renderer_, &rect)) {
+        spdlog::error("drawCollider failed; SDL_RenderRect failed; sdl_error = {}", SDL_GetError());
+    }
+}
+
 void Renderer::present() {
     if (!SDL_RenderPresent(renderer_)) {
         spdlog::error("present failed; sdl_error = {}", SDL_GetError());
@@ -194,9 +211,9 @@ std::optional<SDL_FRect> Renderer::getSpriteSrcRect(const engine::render::Sprite
 bool Renderer::isRectInViewport(const engine::render::Camera& camera, const SDL_FRect& rect) {
     glm::vec2 viewport_size = camera.getViewportSize();
     return rect.x + rect.w >= 0 &&
-           rect.y + rect.h >= 0 &&
-           rect.x <= viewport_size.x &&
-           rect.y <= viewport_size.y;
+            rect.y + rect.h >= 0 &&
+            rect.x <= viewport_size.x &&
+            rect.y <= viewport_size.y;
 }
 } // render
 } // engine

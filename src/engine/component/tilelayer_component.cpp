@@ -9,6 +9,7 @@
 #include "../log/log_manager.h"
 #include "../log/my_log.h"
 #include "../physics/physics_engine.h"
+#include "../render/camera.h"
 #include "../render/renderer.h"
 
 namespace engine {
@@ -73,6 +74,12 @@ void TileLayerComponent::render(engine::core::Context& context) {
                     tile_pos.y -= tile_info.sprite.getSourceRect()->h - static_cast<float>(tile_size_.y);
                 }
                 context.getRenderer().drawSprite(context.getCamera(), tile_info.sprite, tile_pos);
+
+                if (tile_info.type == TileType::HAZARD) {
+                    context.getRenderer().setDrawColor(255,0,0);
+                    context.getRenderer().drawRect(context.getCamera(),tile_pos,tile_info.sprite);
+                }
+
             }
         }
     }

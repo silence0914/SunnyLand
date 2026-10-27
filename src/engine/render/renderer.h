@@ -65,6 +65,9 @@ public:
     void drawUISprite(const Sprite& sprite, const glm::vec2& position,
                       const std::optional<glm::vec2>& size = std::nullopt);
 
+    void drawRect(const engine::render::Camera& camera, const glm::vec2& world_pos,const glm::vec2& size);
+    void drawRect(const engine::render::Camera& camera, const glm::vec2& world_pos,const Sprite& sprite);
+
     void present(); // 更新屏幕
     void clearScreen(); // 清空屏幕
     void setDrawColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255); // 设置画笔颜色， 包装 SDL_SetRenderDrawColor 函数

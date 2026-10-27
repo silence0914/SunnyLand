@@ -27,6 +27,7 @@ enum class TileType {
     SLOPE_1_2, // 斜坡瓦片 左1 右2
     SLOPE_2_0, // 斜坡瓦片 左2 右0
     SLOPE_2_1, // 斜坡瓦片 左2 右1
+    HAZARD,    // 陷阱瓦片
 };
 
 struct TileInfo {

@@ -91,7 +91,8 @@ void GameApp::render() {
 
     // 测试
     scene_manager_->render();
-
+    renderer_->setDrawColor(0,0,255);
+    renderer_->drawRect(*camera_,physics_engine_->playerIntersectTile.position,physics_engine_->playerIntersectTile.size);
 
     // 更新屏幕显示；
     renderer_->present();

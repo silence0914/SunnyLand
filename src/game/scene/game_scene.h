@@ -36,6 +36,7 @@ private:
     [[nodiscard]] bool initEnemyAndItem();
 
     void handleObjectCollisions();                                                                      // 处理游戏对象间的碰撞
+    void handleTileTriggers();                                                                          // 处理瓦片触发事件；
     void playerVsEnemyCollision(engine::object::GameObject& player, engine::object::GameObject& enemy); // 玩家与敌人的碰撞
     void playerVsItemCollision(engine::object::GameObject& player, engine::object::GameObject& item);   // 玩家与道具间碰撞；
 

@@ -63,6 +63,7 @@ void GameScene::handleInput() {
 void GameScene::update(const float dt) {
     Scene::update(dt);
     handleObjectCollisions();
+    handleTileTriggers();
 }
 
 void GameScene::render() {
@@ -177,13 +178,28 @@ void GameScene::handleObjectCollisions() {
                 playerVsEnemyCollision(*obj1, *obj2);
             } else if (obj2->getTag() == "item") {
                 playerVsItemCollision(*obj1, *obj2);
+            } else if (obj2->getTag() == "hazard") {
+                obj1->getComponent<game::component::PlayerComponent>()->takeDamage(1);
             }
         } else if (obj2->getName() == "player") {
             if (obj1->getTag() == "enemy") {
                 playerVsEnemyCollision(*obj2, *obj1);
             } else if (obj1->getTag() == "item") {
                 playerVsItemCollision(*obj2, *obj1);
+            } else if (obj1->getTag() == "hazard") {
+                obj2->getComponent<game::component::PlayerComponent>()->takeDamage(1);
             }
+        }
+    }
+}
+
+void GameScene::handleTileTriggers() {
+    const auto& tile_trigger_events = context_.getPhysicsEngine().getTileTriggerEvent();
+    for (const auto& event: tile_trigger_events) {
+        auto* obj = event.first;
+        auto tile_type = event.second;
+        if (tile_type == engine::component::TileType::HAZARD) {
+            if (obj->getName() == "player") { obj->getComponent<game::component::PlayerComponent>()->takeDamage(1); }
         }
     }
 }

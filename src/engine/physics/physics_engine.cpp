@@ -6,6 +6,7 @@
 
 #include "../component/physics_component.h"
 #include <chrono>
+#include <set>
 
 #include "collision.h"
 #include "../component/collider_component.h"
@@ -52,7 +53,7 @@ void PhysicsEngine::resolveTileCollisions(engine::component::PhysicsComponent& p
     if (world_aabb.size.x <= 0.0f || world_aabb.size.y <= 0.0f) return;
     // -- 检查结束, 正式开始处理 --
 
-    auto tolerance = 1.0f;           // 检查右边缘和下边缘时，需要减1像素，否则会检查到下一行/列的瓦片
+    constexpr auto tolerance = 1.0f; // 检查右边缘和下边缘时，需要减1像素，否则会检查到下一行/列的瓦片
     auto ds = pc.getVelocity() * dt; // 计算物体在delta_time内的位移
     auto new_obj_pos = obj_pos + ds; // 计算物体在delta_time后的新位置
 
@@ -286,9 +287,53 @@ float PhysicsEngine::getTileHeightWidth(float width, engine::component::TileType
     }
 }
 
+void PhysicsEngine::checkTileTriggers() {
+    for (auto* pc: components_) {
+        if (!pc || !pc->isEnabled()) { continue; }
+        auto* obj = pc->getOwner();
+        if (!obj) { return; }
+        auto* cc = obj->getComponent<engine::component::ColliderComponent>();
+        if (!cc || !cc->isActive() || cc->isTrigger()) { continue; }
+        // 获取对象的世界aabb
+        auto world_aabb = cc->getWorldAABB();
+
+        std::set<engine::component::TileType> triggers_set;
+        for (auto* layer: collision_tile_layers_) {
+            if (!layer) { continue; }
+            auto tile_size = layer->getTileSize();
+            constexpr float tolerance = 1.0f; // 检查右边缘和下边缘时， 需要减少一个像素；
+
+            // 计算  对象接触到的瓦片范围；
+            auto start_x = static_cast<int>(floor(world_aabb.position.x / tile_size.x));
+            auto end_x = static_cast<int>(ceil((world_aabb.position.x + world_aabb.size.x - tolerance) / tile_size.x));
+            auto start_y = static_cast<int>(floor(world_aabb.position.y / tile_size.y));
+            auto end_y = static_cast<int>(ceil((world_aabb.position.y + world_aabb.size.y - tolerance) / tile_size.y));
+
+            for (int x = start_x; x < end_x; ++x) {
+                for (int y = start_y; y < end_y; ++y) {
+                    auto tile_type = layer->getTileTypeAt({x, y});
+                    if (tile_type == engine::component::TileType::HAZARD) {
+                        triggers_set.insert(tile_type); // 记录触发事件，保证每个类型的瓦片只触发一次；
+                    }
+                }
+            }
+            for (const auto& type: triggers_set) {
+                tile_trigger_event.emplace_back(obj, type);
+            }
+
+            if (pc->getOwner()->getName() == "player") {
+                glm::vec2 pos{start_x * tile_size.x, start_y * tile_size.y};
+                glm::vec2 size{(end_x - start_x) * tile_size.x, (end_y - start_y) * tile_size.y};
+                playerIntersectTile = {pos, size};
+            }
+        }
+    }
+}
+
 void PhysicsEngine::update(const float dt) {
     // 清空前一帧的碰撞对；
     collision_pairs_.clear();
+    tile_trigger_event.clear();
     // 遍历所有注册的物理组件
     for (const auto& component: components_) {
         if (!component->isEnabled()) { continue; }
@@ -312,7 +357,11 @@ void PhysicsEngine::update(const float dt) {
 
     // 检查碰撞；
     checkObjectCollisions();
+
+    // 检查瓦片触发事件；
+    checkTileTriggers();
 }
+
 
 void PhysicsEngine::checkObjectCollisions() {
     for (int i = 0; i < components_.size() - 1; ++i) {
