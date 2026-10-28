@@ -50,6 +50,7 @@ public:
     [[nodiscard]] float getFrictionFactor() const { return friction_factor_; }   // 摩擦系数
     [[nodiscard]] float getJumpVel() const { return jump_vel_; }                 // 跳跃速度
     [[nodiscard]] float getStunnedDuration() const { return stunned_duration_; } // 硬直时间；
+    [[nodiscard]] float getClimbSpeed() const { return climb_speed_; }           // 爬梯速度
 
     void setIsDead(bool is_dead) { is_dead_ = is_dead; }                                      // 设置死亡状态
     void setMoveForce(float move_force) { move_force_ = move_force; }                         // 设置水平移动力
@@ -57,6 +58,7 @@ public:
     void setFrictionFactor(float friction_factor) { friction_factor_ = friction_factor; }     // 设置摩擦系数
     void setJumpVel(float jump_vel) { jump_vel_ = jump_vel; }                                 // 设置跳跃力
     void setStunnedDuration(float stunned_duration) { stunned_duration_ = stunned_duration; } // 设置硬直时间；
+    void setClimbSpeed(float climb_speed) { climb_speed_ = climb_speed; }                     // 设置爬梯速度
 
     void setState(std::unique_ptr<game::component::state::PlayerState> new_state);
 
@@ -80,7 +82,7 @@ private:
     float max_speed_{120.0f};      // 最大移动速度
     float friction_factor_{0.85f}; // 摩擦系数
     float jump_vel_{350.0f};       // 跳跃速度
-
+    float climb_speed_{100.0f};    // 爬梯速度
     float stunned_duration_{0.4f}; // 硬直时间；
 };
 } // component

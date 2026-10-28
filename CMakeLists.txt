@@ -129,6 +129,8 @@ add_executable(${TARGET}
         src/game/component/ai/patrol_behavior.h
         src/game/component/ai/updown_behavior.cpp
         src/game/component/ai/updown_behavior.h
+        src/game/component/state/climb_state.cpp
+        src/game/component/state/climb_state.h
 
 )
 

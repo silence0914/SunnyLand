@@ -41,6 +41,7 @@ public:
     void addAnimation(std::unique_ptr<engine::render::Animation> animation); // 添加一个动画；
     void playAnimation(const std::string& name);                             // 播放指定名称的动画；
     void stopAnimation() { is_playing_ = false; }                            // 停止当前动画的播放；
+    void resumeAnimation() { is_playing_ = true; }                           // 恢复当前动画的播放；
 
     // get/set
     [[nodiscard]] const std::string& getCurrentAnimationName() const { return current_animation_->getName(); }

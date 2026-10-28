@@ -17,6 +17,7 @@ enum class State {
     HURT,     // 受伤
     DEAD,     // 死亡
     FLY,      // 飞行
+    CLIMB,    //攀爬
     COUNT
 };
 
@@ -29,7 +30,7 @@ static constexpr std::array<std::pair<State, std::string_view>, static_cast<size
         {State::HURT, "hurt"},
         {State::DEAD, "idle"},
         {State::FLY, "fly"},
-
+        {State::CLIMB, "climb"}
     }
 };
 

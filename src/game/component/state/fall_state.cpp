@@ -3,6 +3,8 @@
 //
 
 #include "fall_state.h"
+
+#include "climb_state.h"
 #include "walk_state.h"
 #include "idle_state.h"
 #include "../player_component.h"
@@ -28,6 +30,14 @@ std::unique_ptr<PlayerState> FallState::handleInput(engine::core::Context& conte
         moveLeft();
     } else if (input_manager.isActionDown(std::string{engine::utils::action::MOVE_RIGHT})) {
         moveRight();
+    }
+
+    // 接触到梯子  上下键可以 爬梯
+    if (player_component_.getPhysicsComponent().isCollidedLadder()) {
+        if (input_manager.isActionDown(std::string{engine::utils::action::MOVE_UP}) ||
+            input_manager.isActionDown(std::string{engine::utils::action::MOVE_DOWN})) {
+            return std::make_unique<game::component::state::ClimbState>(player_component_);
+        }
     }
     return nullptr;
 }

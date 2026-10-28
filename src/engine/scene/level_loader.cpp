@@ -66,6 +66,7 @@ constexpr static std::string_view DURATION{"duration"};
 constexpr static std::string_view ROW{"row"};
 constexpr static std::string_view FRAMES{"frames"};
 constexpr static std::string_view ANIMATION{"animation"};
+constexpr static std::string_view LADDER{"ladder"};
 
 
 bool LevelLoader::loadLevel(const std::string& map_path, Scene& scene) {
@@ -472,12 +473,15 @@ engine::component::TileType LevelLoader::getTileType(const nlohmann::json& tile_
                 spdlog::error("unknown slope type;type = {}", slope_type);
                 return engine::component::TileType::NORMAL;
             }
-        } else if (property_name == UNISOLID.data()) {
+        } else if (property_name == std::string{UNISOLID}) {
             auto is_unisolid = property.value(VALUE, false);
             return is_unisolid ? engine::component::TileType::UNISOLID : engine::component::TileType::NORMAL;
         } else if (property_name == "hazard") {
             auto is_hazard = property.value(VALUE, false);
             return is_hazard ? engine::component::TileType::HAZARD : engine::component::TileType::NORMAL;
+        } else if (property_name == std::string{LADDER}) {
+            auto is_ladder = property.value(VALUE, false);
+            return is_ladder ? engine::component::TileType::LADDER : engine::component::TileType::NORMAL;
         }
     }
     return engine::component::TileType::NORMAL;

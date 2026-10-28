@@ -139,6 +139,24 @@ void PhysicsEngine::resolveTileCollisions(engine::component::PhysicsComponent& p
                 new_obj_pos.y = tile_y * layer->getTileSize().y - obj_size.y;
                 pc.setVelocityY(0.0f);
                 pc.setCollidedBelow(true);
+                // 两个角点都在梯子上； 判断是否在梯子顶层；
+            } else if (tile_type_left == engine::component::TileType::LADDER &&
+                tile_type_right == engine::component::TileType::LADDER) {
+                auto tile_type_up_l = layer->getTileTypeAt({tile_x, tile_y - 1});
+                auto tile_type_up_r = layer->getTileTypeAt({tile_x_right, tile_y - 1});
+                // 两个角点上面的瓦片不是梯子；  认为是在梯子顶；
+                if (tile_type_up_l != engine::component::TileType::LADDER &&
+                    tile_type_up_r != engine::component::TileType::LADDER) {
+                    // 通过重力判断是否处于攀爬状态；
+                    if (pc.isUseGravity()) {
+                        // 结束了攀爬状态；  设定在梯子顶部；
+                        pc.setIsOnTopLadder(true);
+                        pc.setCollidedBelow(true);
+                        // 位置吸附在地面；
+                        new_obj_pos.y = tile_y * layer->getTileSize().y - obj_size.y;
+                        pc.setVelocityY(0.0f);
+                    }
+                }
             } else {
                 // 检测斜坡瓦片 下方两个点都要检测；
                 auto width_left = obj_pos.x - tile_x * tile_size.x;
@@ -314,6 +332,8 @@ void PhysicsEngine::checkTileTriggers() {
                     auto tile_type = layer->getTileTypeAt({x, y});
                     if (tile_type == engine::component::TileType::HAZARD) {
                         triggers_set.insert(tile_type); // 记录触发事件，保证每个类型的瓦片只触发一次；
+                    } else if (tile_type == engine::component::TileType::LADDER) {
+                        pc->setCollidedLadder(true); // 设置物理碰撞 梯子；
                     }
                 }
             }

@@ -3,6 +3,8 @@
 //
 
 #include "jump_state.h"
+
+#include "climb_state.h"
 #include "fall_state.h"
 #include "../player_component.h"
 #include "../../../engine/component/physics_component.h"
@@ -28,6 +30,14 @@ std::unique_ptr<PlayerState> JumpState::handleInput(engine::core::Context& conte
     auto& input_manager = context.getInputManager();
     auto& physics_component = player_component_.getPhysicsComponent();
     auto& sprite_component = player_component_.getSpriteComponent();
+
+    // 跳跃 空中爬梯
+    if (physics_component.isCollidedLadder()) {
+        if (input_manager.isActionDown(std::string{engine::utils::action::MOVE_UP}) ||
+            input_manager.isActionDown(std::string{engine::utils::action::MOVE_DOWN})) {
+            return std::make_unique<game::component::state::ClimbState>(player_component_);
+        }
+    }
 
     // 跳跃状态下可以左右移动；
     if (input_manager.isActionDown(std::string{engine::utils::action::MOVE_LEFT})) {
