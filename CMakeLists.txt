@@ -118,6 +118,17 @@ add_executable(${TARGET}
         src/game/component/state/dead_state.h
         src/engine/component/health_component.cpp
         src/engine/component/health_component.h
+        src/game/component/ai/ai_behavior.cpp
+        src/game/component/ai/ai_behavior.h
+        src/game/component/ai_component.cpp
+        src/game/component/ai_component.h
+        src/game/component/ai/jump_behavior.cpp
+        src/game/component/ai/jump_behavior.h
+        src/game/component/utils.h
+        src/game/component/ai/patrol_behavior.cpp
+        src/game/component/ai/patrol_behavior.h
+        src/game/component/ai/updown_behavior.cpp
+        src/game/component/ai/updown_behavior.h
 
 )
 

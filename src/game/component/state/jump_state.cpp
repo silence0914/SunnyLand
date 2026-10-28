@@ -18,7 +18,7 @@ namespace state {
 void JumpState::enter() {
     playAnimation("jump");
     auto& physics_component = player_component_.getPhysicsComponent();
-    physics_component.setVelocityY(-player_component_.getJumpForce());
+    physics_component.setVelocityY(-player_component_.getJumpVel());
     mylog::MyLog{}.debug("playerComponent Jump;");
 }
 

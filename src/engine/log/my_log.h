@@ -20,7 +20,11 @@ public:
         // 优化：在构造时一次性提取纯文件名，避免每次打日志都去搜索 '/'
         std::string_view sv(file_);
         const size_t pos = sv.find_last_of("/\\");
-        filename_only_ = (pos != std::string_view::npos) ? sv.substr(pos + 1) : sv;
+        filename_only_ = pos != std::string_view::npos ? sv.substr(pos + 1) : sv;
+
+        const size_t end = func_.find_first_of("(");
+        const size_t start = func_.rfind(":", end);
+        func_ = func_.substr(start + 1,end - start -1);
     }
 
     ~MyLog() = default;
@@ -114,22 +118,22 @@ private:
     void log(spdlog::level::level_enum lvl, const T& msg) {
         switch (lvl) {
             case spdlog::level::trace:
-                spdlog::trace("[{}:{}:{}] : {} ", filename_only_, func_, line_, msg);
+                spdlog::trace("[{} : {} : {}] : {} ", filename_only_, func_, line_, msg);
                 break;
             case spdlog::level::debug:
-                spdlog::debug("[{}:{}:{}] : {} ", filename_only_, func_, line_, msg);
+                spdlog::debug("[{} : {} : {}] : {} ", filename_only_, func_, line_, msg);
                 break;
             case spdlog::level::info:
-                spdlog::info("[{}:{}:{}] : {} ", filename_only_, func_, line_, msg);
+                spdlog::info("[{} : {} : {}] : {} ", filename_only_, func_, line_, msg);
                 break;
             case spdlog::level::warn:
-                spdlog::warn("[{}:{}:{}] : {} ", filename_only_, func_, line_, msg);
+                spdlog::warn("[{} : {} : {}] : {} ", filename_only_, func_, line_, msg);
                 break;
             case spdlog::level::err:
-                spdlog::error("[{}:{}:{}] : {} ", filename_only_, func_, line_, msg);
+                spdlog::error("[{} : {} : {}] : {} ", filename_only_, func_, line_, msg);
                 break;
             case spdlog::level::critical:
-                spdlog::critical("[{}:{}:{}] : {} ", filename_only_, func_, line_, msg);
+                spdlog::critical("[{} : {} : {}] : {} ", filename_only_, func_, line_, msg);
                 break;
             default:
                 break;

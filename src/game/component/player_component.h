@@ -48,14 +48,14 @@ public:
     [[nodiscard]] float getMoveForce() const { return move_force_; }             // 水平移动力
     [[nodiscard]] float getMaxSpeed() const { return max_speed_; }               // 最大移动速度
     [[nodiscard]] float getFrictionFactor() const { return friction_factor_; }   // 摩擦系数
-    [[nodiscard]] float getJumpForce() const { return jump_force_; }             // 跳跃力
+    [[nodiscard]] float getJumpVel() const { return jump_vel_; }                 // 跳跃速度
     [[nodiscard]] float getStunnedDuration() const { return stunned_duration_; } // 硬直时间；
 
     void setIsDead(bool is_dead) { is_dead_ = is_dead; }                                      // 设置死亡状态
     void setMoveForce(float move_force) { move_force_ = move_force; }                         // 设置水平移动力
     void setMaxSpeed(float max_speed) { max_speed_ = max_speed; }                             // 设置最大移动速度
     void setFrictionFactor(float friction_factor) { friction_factor_ = friction_factor; }     // 设置摩擦系数
-    void setJumpForce(float jump_force) { jump_force_ = jump_force; }                         // 设置跳跃力
+    void setJumpVel(float jump_vel) { jump_vel_ = jump_vel; }                                 // 设置跳跃力
     void setStunnedDuration(float stunned_duration) { stunned_duration_ = stunned_duration; } // 设置硬直时间；
 
     void setState(std::unique_ptr<game::component::state::PlayerState> new_state);
@@ -79,7 +79,7 @@ private:
     float move_force_{200.0f};     // 水平移动力
     float max_speed_{120.0f};      // 最大移动速度
     float friction_factor_{0.85f}; // 摩擦系数
-    float jump_force_{350.0f};     // 跳跃力
+    float jump_vel_{350.0f};       // 跳跃速度
 
     float stunned_duration_{0.4f}; // 硬直时间；
 };

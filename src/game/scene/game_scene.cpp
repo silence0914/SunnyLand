@@ -22,8 +22,11 @@
 #include "../../engine/render/camera.h"
 #include "../../engine/scene/level_loader.h"
 #include "../../engine/utils/action.h"
+#include "../component/ai_component.h"
 #include "../component/state/player_state.h"
 #include "../component/player_component.h"
+#include "../component/ai/patrol_behavior.h"
+#include "../component/ai/updown_behavior.h"
 
 namespace game::scene {
 GameScene::GameScene(std::string name, engine::core::Context& context, engine::scene::SceneManager& scene_manager)
@@ -133,31 +136,27 @@ bool GameScene::initEnemyAndItem() {
     bool success = true;
     for (auto& game_object: game_objects_) {
         if (game_object->getName() == "eagle") {
-            if (auto* ac = game_object->getComponent<engine::component::AnimationComponent>(); ac) {
-                ac->playAnimation("fly");
-            } else {
-                mylog::MyLog{}.error("'{}' initEnemyAndItem failed;findAnimationComponent failed;", scene_name_);
-                success = false;
+            if (auto* ai_component = game_object->addComponent<game::component::AiComponent>()) {
+                auto y_down = game_object->getComponent<engine::component::TransformComponent>()->getPosition().y;
+                auto y_up = y_down - 80.0f; // 鹰巡逻范围为初始位置 至 其上方80像素；
+                ai_component->setBehavior(std::make_unique<game::component::ai::UpdownBehavior>(y_up, y_down));
             }
-        }
-        if (game_object->getName() == "frog") {
-            if (auto* ac = game_object->getComponent<engine::component::AnimationComponent>(); ac) {
-                ac->playAnimation("idle");
-            } else {
-                success = false;
+        } else if (game_object->getName() == "frog") {
+            if (auto* ai_component = game_object->addComponent<game::component::AiComponent>()) {
+                auto x_right = game_object->getComponent<engine::component::TransformComponent>()->getPosition().x;
+                auto x_left = x_right - 90.0f;
+                ai_component->setBehavior(std::make_unique<game::component::ai::JumpBehavior>(x_left, x_right));
             }
-        }
-        if (game_object->getName() == "opossum") {
-            if (auto* ac = game_object->getComponent<engine::component::AnimationComponent>(); ac) {
-                ac->playAnimation("walk");
-            } else {
-                spdlog::error("Opossum对象缺少 AnimationComponent，无法播放动画。");
-                success = false;
+        } else if (game_object->getName() == "opossum") {
+            if (auto* ai_component = game_object->addComponent<game::component::AiComponent>()) {
+                auto x_right = game_object->getComponent<engine::component::TransformComponent>()->getPosition().x;
+                auto x_left = x_right - 200.0f;
+                ai_component->setBehavior(std::make_unique<game::component::ai::PatrolBehavior>(x_left, x_right));
             }
         }
         if (game_object->getTag() == "item") {
             if (auto* ac = game_object->getComponent<engine::component::AnimationComponent>(); ac) {
-                ac->playAnimation("idle");
+                ac->playAnimation(component::toString(component::State::IDLE));
             } else {
                 spdlog::error("Item对象缺少 AnimationComponent，无法播放动画。");
                 success = false;
