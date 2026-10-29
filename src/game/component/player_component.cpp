@@ -21,7 +21,7 @@ namespace component {
 bool PlayerComponent::takeDamage(int damage) {
     if (is_dead_ || damage < 1) { return false; }
     if (!health_component_->takeDamage(damage)) { return false; }
-    spdlog::info("hp = {}",health_component_->getCurrentHealth());
+    spdlog::info("hp = {}", health_component_->getCurrentHealth());
     if (health_component_->isAlive()) {
         // 没死亡  进入硬直；
         setState(std::make_unique<game::component::state::HurtState>(*this));
@@ -39,6 +39,10 @@ void PlayerComponent::setState(std::unique_ptr<game::component::state::PlayerSta
     current_state_ = std::move(new_state);
     mylog::MyLog{}.debug("player setState '{}'", typeid(*current_state_).name());
     current_state_->enter();
+}
+
+bool PlayerComponent::is_on_ground() const {
+    return coyote_time_ > coyote_timer_ || physics_component_->isCollidedBelow();
 }
 
 void PlayerComponent::init() {
@@ -72,6 +76,31 @@ void PlayerComponent::update(const float dt, engine::core::Context& context) {
     if (!current_state_) { return; }
     auto next_state = current_state_->update(dt, context);
     if (next_state) { setState(std::move(next_state)); }
+
+    // Coyote time;
+    if (!physics_component_->isCollidedBelow()) {
+        coyote_timer_ += dt; // 离开地面开始计时；
+    } else {
+        coyote_timer_ = 0.0f;
+    }
+
+    // 无敌闪烁；
+    if (health_component_->isInvincible()) {
+        flash_timer_ += dt;
+        if (flash_timer_ > 2 * flash_interval_) {
+            flash_timer_ -= 2 * flash_interval_; // 闪烁计时器在 0-2倍闪烁间隔中循环；
+        }
+        if (flash_timer_ < flash_interval_) {
+            sprite_component_->setIsHidden(true);
+        } else {
+            sprite_component_->setIsHidden(false);
+        }
+    } else {
+        // 非无敌状态下   确保精灵可见；
+        if (sprite_component_->isHidden()) {
+            sprite_component_->setIsHidden(false);
+        }
+    }
 }
 } // component
 } // game

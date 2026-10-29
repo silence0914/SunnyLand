@@ -58,7 +58,7 @@ std::unique_ptr<PlayerState> WalkState::update(const float, engine::core::Contex
     physics_component.setVelocityX(glm::clamp(physics_component.getVelocity().x, -max_speed, max_speed));
 
     // 如果下方没有碰撞；  切换到fallState
-    if (!physics_component.isCollidedBelow()) {
+    if (!player_component_.is_on_ground()) {
         return std::make_unique<game::component::state::FallState>(player_component_);
     }
     return nullptr;

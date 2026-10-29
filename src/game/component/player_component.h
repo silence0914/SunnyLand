@@ -61,6 +61,7 @@ public:
     void setClimbSpeed(float climb_speed) { climb_speed_ = climb_speed; }                     // 设置爬梯速度
 
     void setState(std::unique_ptr<game::component::state::PlayerState> new_state);
+    bool is_on_ground() const;
 
 protected:
     void init() override;
@@ -84,6 +85,14 @@ private:
     float jump_vel_{350.0f};       // 跳跃速度
     float climb_speed_{100.0f};    // 爬梯速度
     float stunned_duration_{0.4f}; // 硬直时间；
+
+    // 无敌时间闪烁
+    static constexpr float flash_interval_ = 0.1f; // 闪烁间隔时间
+    float flash_timer_ = 0.0f;                     // 闪烁计时器；用于无敌状态下的闪烁效果；
+
+    // 土狼时间
+    static constexpr float coyote_time_ = 0.1f; // Coyote Time 持续时长
+    float coyote_timer_ = 0.0f;                 // Coyote Time 计时器
 };
 } // component
 } // game

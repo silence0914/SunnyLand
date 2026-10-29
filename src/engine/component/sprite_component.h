@@ -70,7 +70,7 @@ public:
     [[nodiscard]] glm::vec2 getSpriteSize() const { return sprite_size_; }
     [[nodiscard]] glm::vec2 getOffset() const { return offset_; }
     [[nodiscard]] bool isFlipped() { return sprite_.isIsFlipped(); }
-    [[nodiscard]] bool isIsHidden() const { return is_hidden_; }
+    [[nodiscard]] bool isHidden() const { return is_hidden_; }
 
     void setSpriteById(const std::string& texture_id, const std::optional<SDL_FRect>& source_rect = std::nullopt);
     void setIsFlipped(bool is_flipped) { sprite_.setIsFlipped(is_flipped); } // 设置翻转
