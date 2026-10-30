@@ -79,25 +79,25 @@ public:
     [[nodiscard]] bool isCollidedAbove() const { return collided_above_; }
     [[nodiscard]] bool isCollidedLeft() const { return collided_left_; }
     [[nodiscard]] bool isCollidedRight() const { return collided_right_; }
-    [[nodiscard]] bool isCollidedLadder() const { return collided_ladder; }
-    [[nodiscard]] bool isOnTopLadder() const { return is_on_top_ladder; }
+    [[nodiscard]] bool isCollidedLadder() const { return collided_ladder_; }
+    [[nodiscard]] bool isOnTopLadder() const { return is_on_top_ladder_; }
 
-    void setMass(float mass) { mass_ = mass; }                                                  // 设置质量
-    void setUseGravity(bool use_gravity) { use_gravity_ = use_gravity; }                        // 设置是否受重力影响
-    void setEnabled(bool enabled) { enabled_ = enabled; }                                       // 设置是否激活
-    void setCollidedBelow(bool collided_below) { collided_below_ = collided_below; }            // 设置下方是否碰撞；
-    void setCollidedAbove(bool collided_above) { collided_above_ = collided_above; }            // 设置上方是否碰撞；
-    void setCollidedLeft(bool collided_left) { collided_left_ = collided_left; }                // 设置左侧是否碰撞；
-    void setCollidedRight(bool collided_right) { collided_right_ = collided_right; }            // 设置右侧是否碰撞；
-    void setCollidedLadder(bool collided_ladder) { this->collided_ladder = collided_ladder; }   // 设置是否与梯子碰撞；
-    void setIsOnTopLadder(bool is_on_top_ladder) { this->is_on_top_ladder = is_on_top_ladder; } // 设置是否在梯子顶部；
+    void setMass(float mass) { mass_ = mass; }                                             // 设置质量
+    void setUseGravity(bool use_gravity) { use_gravity_ = use_gravity; }                   // 设置是否受重力影响
+    void setEnabled(bool enabled) { enabled_ = enabled; }                                  // 设置是否激活
+    void setCollidedBelow(bool collided_below) { collided_below_ = collided_below; }       // 设置下方是否碰撞；
+    void setCollidedAbove(bool collided_above) { collided_above_ = collided_above; }       // 设置上方是否碰撞；
+    void setCollidedLeft(bool collided_left) { collided_left_ = collided_left; }           // 设置左侧是否碰撞；
+    void setCollidedRight(bool collided_right) { collided_right_ = collided_right; }       // 设置右侧是否碰撞；
+    void setCollidedLadder(bool collided_ladder) { collided_ladder_ = collided_ladder; }   // 设置是否与梯子碰撞；
+    void setIsOnTopLadder(bool is_on_top_ladder) { is_on_top_ladder_ = is_on_top_ladder; } // 设置是否在梯子顶部；
 
     void resetCollisionFlags() {
         collided_above_ = false;
         collided_below_ = false;
         collided_left_ = false;
         collided_right_ = false;
-        collided_ladder = false;
+        collided_ladder_ = false;
     }
 
 private:
@@ -124,8 +124,8 @@ private:
     bool collided_above_{false};
     bool collided_left_{false};
     bool collided_right_{false};
-    bool collided_ladder{false};
-    bool is_on_top_ladder{false};
+    bool collided_ladder_{false};
+    bool is_on_top_ladder_{false};
 };
 } // component
 } // engine

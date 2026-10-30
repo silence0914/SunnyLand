@@ -16,6 +16,7 @@
 #include "../object/game_object.h"
 #include "../component/tilelayer_component.h"
 #include "../component/animation_component.h"
+#include "../component/audio_component.h"
 #include "../component/collider_component.h"
 #include "../component/health_component.h"
 #include "../component/physics_component.h"
@@ -67,6 +68,7 @@ constexpr static std::string_view ROW{"row"};
 constexpr static std::string_view FRAMES{"frames"};
 constexpr static std::string_view ANIMATION{"animation"};
 constexpr static std::string_view LADDER{"ladder"};
+constexpr static std::string_view SOUND{"sound"};
 
 
 bool LevelLoader::loadLevel(const std::string& map_path, Scene& scene) {
@@ -271,6 +273,20 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
             }
             auto* ac = game_object->addComponent<engine::component::AnimationComponent>();
             addAnimation(anim_json, *ac, src_size);
+        }
+
+        auto sound_string = getTileProperty<std::string>(tile_json.value(), std::string{SOUND});
+        if (sound_string.has_value()) {
+            nlohmann::json sound_json;
+            try {
+                sound_json = nlohmann::json::parse(sound_string.value());
+            } catch (const nlohmann::json::parse_error& e) {
+                mylog::MyLog{}.error("parse sound_string error: {}", e.what());
+                continue;
+            }
+            auto* audio_component = game_object->addComponent<engine::component::AudioComponent>
+                    (scene.getContext().getAudioPlayer(), scene.getContext().getCamera());
+            addSound(sound_json, *audio_component);
         }
 
         if (auto health = getTileProperty<int>(tile_json.value(), "health")) {
@@ -496,6 +512,18 @@ engine::component::TileType LevelLoader::getTileTypeById(const nlohmann::json& t
         }
     }
     return engine::component::TileType::NORMAL;
+}
+
+void LevelLoader::addSound(const nlohmann::json& sound_json, engine::component::AudioComponent& audio_component) {
+    if (!sound_json.is_object()) { return; }
+    for (auto& sound: sound_json.items()) {
+        const std::string& sound_id = sound.key();
+        const std::string& sound_path = sound.value();
+        if (sound_id.empty() || sound_path.empty()) {
+            continue;
+        }
+        audio_component.addSound(sound_id, sound_path);
+    }
 }
 } // scene
 } // engine

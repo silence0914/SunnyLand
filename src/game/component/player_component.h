@@ -19,6 +19,7 @@ class PhysicsComponent;
 class SpriteComponent;
 class TransformComponent;
 class AnimationComponent;
+class AudioComponent;
 }
 
 namespace game {
@@ -44,6 +45,8 @@ public:
     [[nodiscard]] engine::component::PhysicsComponent& getPhysicsComponent() const { return *physics_component_; }
     [[nodiscard]] engine::component::AnimationComponent& getAnimationComponent() const { return *animation_component_; }
     [[nodiscard]] engine::component::HealthComponent& getHealthComponent() const { return *health_component_; }
+    [[nodiscard]] engine::component::AudioComponent& getAudioComponent() const { return *audio_component_; }
+
     [[nodiscard]] bool isIsDead() const { return is_dead_; }                     // 是否死亡
     [[nodiscard]] float getMoveForce() const { return move_force_; }             // 水平移动力
     [[nodiscard]] float getMaxSpeed() const { return max_speed_; }               // 最大移动速度
@@ -61,7 +64,7 @@ public:
     void setClimbSpeed(float climb_speed) { climb_speed_ = climb_speed; }                     // 设置爬梯速度
 
     void setState(std::unique_ptr<game::component::state::PlayerState> new_state);
-    bool is_on_ground() const;
+    [[nodiscard]] bool is_on_ground() const;
 
 protected:
     void init() override;
@@ -74,6 +77,7 @@ private:
     engine::component::PhysicsComponent* physics_component_;
     engine::component::AnimationComponent* animation_component_;
     engine::component::HealthComponent* health_component_;
+    engine::component::AudioComponent* audio_component_;
 
     std::unique_ptr<game::component::state::PlayerState> current_state_; // 当前状态
     bool is_dead_{false};                                                // 是否死亡

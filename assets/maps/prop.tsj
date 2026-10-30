@@ -231,7 +231,7 @@
                  "type":"bool",
                  "value":true
                 }]
-        },
+        }, 
         {
          "id":26,
          "image":"..\/textures\/Props\/spikes.png",

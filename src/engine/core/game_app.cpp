@@ -12,6 +12,7 @@
 #include "config.h"
 #include "context.h"
 #include "../../game/scene/game_scene.h"
+#include "../audio/audio_player.h"
 #include "../component/sprite_component.h"
 #include "../render/camera.h"
 #include "../render/renderer.h"
@@ -61,6 +62,7 @@ bool GameApp::init() {
     if (!initInputManager()) { return false; }
     if (!initSceneManager()) { return false; }
     if (!initPhysicsEngine()) { return false; }
+    if (!initAudioPlayer()) { return false; }
 
     if (!initContext()) { return false; }
     auto scene = std::make_unique<game::scene::GameScene>("GameScene", *context_, *scene_manager_);
@@ -91,8 +93,9 @@ void GameApp::render() {
 
     // 测试
     scene_manager_->render();
-    renderer_->setDrawColor(0,0,255);
-    renderer_->drawRect(*camera_,physics_engine_->playerIntersectTile.position,physics_engine_->playerIntersectTile.size);
+    renderer_->setDrawColor(0, 0, 255);
+    renderer_->drawRect(*camera_, physics_engine_->playerIntersectTile.position,
+                        physics_engine_->playerIntersectTile.size);
 
     // 更新屏幕显示；
     renderer_->present();
@@ -214,7 +217,7 @@ bool GameApp::initInputManager() {
 bool GameApp::initContext() {
     try {
         context_ = std::make_unique<engine::core::Context>(*camera_, *renderer_, *input_manager_, *resource_manager_,
-                                                           *physics_engine_);
+                                                           *physics_engine_, *audio_player_);
     } catch (const std::exception& e) {
         spdlog::error("initContext failed; error : {}", e.what());
         return false;
@@ -237,6 +240,16 @@ bool GameApp::initPhysicsEngine() {
         physics_engine_ = std::make_unique<engine::physics::PhysicsEngine>();
     } catch (const std::exception& e) {
         spdlog::error("initPhysicsEngine failed;error : {}", e.what());
+        return false;
+    }
+    return true;
+}
+
+bool GameApp::initAudioPlayer() {
+    try {
+        audio_player_ = std::make_unique<engine::audio::AudioPlayer>(*resource_manager_);
+    } catch (const std::exception& e) {
+        spdlog::error("initAudioPlayer failed;error : {}", e.what());
         return false;
     }
     return true;

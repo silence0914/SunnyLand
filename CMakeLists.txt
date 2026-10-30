@@ -131,6 +131,10 @@ add_executable(${TARGET}
         src/game/component/ai/updown_behavior.h
         src/game/component/state/climb_state.cpp
         src/game/component/state/climb_state.h
+        src/engine/audio/audio_player.cpp
+        src/engine/audio/audio_player.h
+        src/engine/component/audio_component.cpp
+        src/engine/component/audio_component.h
 
 )
 

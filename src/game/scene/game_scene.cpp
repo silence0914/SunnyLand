@@ -4,6 +4,7 @@
 
 #include "game_scene.h"
 
+#include "../../engine/audio/audio_player.h"
 #include "../../engine/object/game_object.h"
 #include "../../engine/component/collider_component.h"
 #include "../../engine/component/physics_component.h"
@@ -54,6 +55,12 @@ void GameScene::init() {
         context_.getInputManager().setShouldQuit(true);
         render();
     }
+
+    // 设置音量
+    context_.getAudioPlayer().setMusicVolume(0.2f);
+    context_.getAudioPlayer().setSoundVolume(0.5f);
+
+    context_.getAudioPlayer().playMusic("assets/audio/hurry_up_and_run.ogg", -1, 1000);
 
     Scene::init();
     mylog::MyLog{}.trace("init success");
@@ -220,6 +227,7 @@ void GameScene::playerVsEnemyCollision(engine::object::GameObject& player, engin
             createEffect(enemy_center, enemy.getTag()); // 创建死亡动画；
         }
         player.getComponent<engine::component::PhysicsComponent>()->setVelocityY(-300.f); // 向上跳起；
+        context_.getAudioPlayer().playSound("assets/audio/punch2a.mp3");
     } else {
         // 踩踏失败； 受到伤害；
         player.getComponent<game::component::PlayerComponent>()->takeDamage(1);
@@ -233,6 +241,7 @@ void GameScene::playerVsItemCollision(engine::object::GameObject& player, engine
     item.setNeedRemove(true);
     auto item_aabb = item.getComponent<engine::component::ColliderComponent>()->getWorldAABB();
     createEffect(item_aabb.getCenter(), item.getTag());
+    context_.getAudioPlayer().playSound("assets/audio/poka01.mp3");
 }
 
 void GameScene::createEffect(const glm::vec2& center_pos, const std::string& tag) {

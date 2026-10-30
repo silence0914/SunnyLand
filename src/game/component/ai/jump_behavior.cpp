@@ -6,6 +6,7 @@
 
 #include "../ai_component.h"
 #include "../../../engine/component/animation_component.h"
+#include "../../../engine/component/audio_component.h"
 #include "../../../engine/component/physics_component.h"
 #include "../../../engine/component/sprite_component.h"
 #include "../../../engine/component/transform_component.h"
@@ -43,6 +44,7 @@ void JumpBehavior::update(const float dt, game::component::AiComponent& ai_compo
     auto& physics_component = ai_component.getPhysicsComponent();
     auto& sprite_component = ai_component.getSpriteComponent();
     auto& transform_component = ai_component.getTransformComponent();
+    auto& audio_component = ai_component.getAudioComponent();
 
     auto is_on_ground = physics_component.isCollidedBelow();
     if (!is_on_ground) {
@@ -54,6 +56,9 @@ void JumpBehavior::update(const float dt, game::component::AiComponent& ai_compo
         }
         return;
     }
+
+    audio_component.playSound("cry", -1, true);
+
     jump_timer_ += dt;
     physics_component.setVelocityX(0.0f);
 

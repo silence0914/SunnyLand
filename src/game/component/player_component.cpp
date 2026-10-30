@@ -12,6 +12,7 @@
 #include "../../engine/component/sprite_component.h"
 #include "../../engine/component/animation_component.h"
 #include "../../engine/component/health_component.h"
+#include "../../engine/component/audio_component.h"
 #include "state/dead_state.h"
 #include "state/hurt_state.h"
 #include "state/idle_state.h"
@@ -56,6 +57,13 @@ void PlayerComponent::init() {
     sprite_component_ = owner_->getComponent<engine::component::SpriteComponent>();
     animation_component_ = owner_->getComponent<engine::component::AnimationComponent>();
     health_component_ = owner_->getComponent<engine::component::HealthComponent>();
+    audio_component_ = owner_->getComponent<engine::component::AudioComponent>();
+
+    // 检查必要组件是否存在
+    if (!transform_component_ || !physics_component_ || !sprite_component_ ||
+        !animation_component_ || !health_component_ || !audio_component_) {
+        mylog::MyLog{}.error("PlayerComponent missing component");
+    }
 
     // 初始化 状态机
     current_state_ = std::make_unique<game::component::state::IdleState>(*this);

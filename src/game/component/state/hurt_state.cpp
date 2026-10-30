@@ -8,6 +8,7 @@
 #include "idle_state.h"
 #include "walk_state.h"
 #include "../player_component.h"
+#include "../../../engine/component/audio_component.h"
 #include "../../../engine/component/physics_component.h"
 #include "../../../engine/component/sprite_component.h"
 
@@ -27,6 +28,7 @@ void HurtState::enter() {
         knockback_velocity.x = -knockback_velocity.x;
     }
     physics_component.setVelocity(knockback_velocity);
+    player_component_.getAudioComponent().playSound("hurt");
 }
 
 void HurtState::exit() {}

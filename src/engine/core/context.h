@@ -5,6 +5,10 @@
 #ifndef CONTEXT_H
 #define CONTEXT_H
 
+namespace engine::audio {
+class AudioPlayer;
+}
+
 namespace engine::physics {
 class PhysicsEngine;
 }
@@ -34,7 +38,9 @@ public:
             engine::render::Renderer& renderer,
             engine::input::InputManager& input_manager,
             engine::resource::ResourceManager& resource_manager,
-            engine::physics::PhysicsEngine&);
+            engine::physics::PhysicsEngine&,
+            engine::audio::AudioPlayer&
+    );
 
     ~Context() = default;
 
@@ -49,6 +55,7 @@ public:
     [[nodiscard]] engine::input::InputManager& getInputManager() const { return input_manager_; }
     [[nodiscard]] engine::resource::ResourceManager& getResourceManager() const { return resource_manager_; }
     [[nodiscard]] engine::physics::PhysicsEngine& getPhysicsEngine() const { return physics_engine_; }
+    [[nodiscard]] engine::audio::AudioPlayer& getAudioPlayer() const { return audio_player_; }
 
 private:
     engine::render::Camera& camera_;
@@ -56,6 +63,7 @@ private:
     engine::input::InputManager& input_manager_;
     engine::resource::ResourceManager& resource_manager_;
     engine::physics::PhysicsEngine& physics_engine_;
+    engine::audio::AudioPlayer& audio_player_;
 };
 } // core
 // engine

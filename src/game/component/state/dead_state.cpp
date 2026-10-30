@@ -5,6 +5,7 @@
 #include "dead_state.h"
 
 #include "../player_component.h"
+#include "../../../engine/component/audio_component.h"
 #include "../../../engine/component/collider_component.h"
 #include "../../../engine/component/physics_component.h"
 #include "../../../engine/log/log_manager.h"
@@ -26,6 +27,8 @@ void DeadState::enter() {
     if (collider_component) {
         collider_component->setActive(false);
     }
+
+    player_component_.getAudioComponent().playSound("dead");
 }
 
 void DeadState::exit() {}

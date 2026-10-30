@@ -9,6 +9,10 @@
 #include <chrono>
 
 
+namespace engine::audio {
+class AudioPlayer;
+}
+
 namespace engine::physics {
 class PhysicsEngine;
 }
@@ -70,7 +74,7 @@ private:
     [[nodiscard]] bool initContext();
     [[nodiscard]] bool initSceneManager();
     [[nodiscard]] bool initPhysicsEngine();
-
+    [[nodiscard]] bool initAudioPlayer();
 
 private:
     SDL_Window* window_{nullptr};
@@ -86,6 +90,7 @@ private:
     std::unique_ptr<engine::input::InputManager> input_manager_;          // 输入管理
     std::unique_ptr<engine::scene::SceneManager> scene_manager_;          // 场景管理
     std::unique_ptr<engine::physics::PhysicsEngine> physics_engine_;      // 物理引擎
+    std::unique_ptr<engine::audio::AudioPlayer> audio_player_;            // 音频播放器
 };
 }
 

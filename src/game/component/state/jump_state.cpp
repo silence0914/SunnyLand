@@ -7,6 +7,7 @@
 #include "climb_state.h"
 #include "fall_state.h"
 #include "../player_component.h"
+#include "../../../engine/component/audio_component.h"
 #include "../../../engine/component/physics_component.h"
 #include "../../../engine/component/sprite_component.h"
 #include "../../../engine/core/context.h"
@@ -21,6 +22,7 @@ void JumpState::enter() {
     playAnimation("jump");
     auto& physics_component = player_component_.getPhysicsComponent();
     physics_component.setVelocityY(-player_component_.getJumpVel());
+    player_component_.getAudioComponent().playSound("jump");
     mylog::MyLog{}.debug("playerComponent Jump;");
 }
 

@@ -36,8 +36,8 @@ public:
     [[nodiscard]] glm::vec2 worldToScreenWithParallax(const glm::vec2& world_pos, const glm::vec2& scroll_factor) const;
     [[nodiscard]] glm::vec2 screenToWorld(const glm::vec2& screen_pos) const; // 屏幕坐标转世界坐标；
 
-    [[nodiscard]] glm::vec2 getPosition1() const { return position_; }                                 // 获取相机坐标；
-    [[nodiscard]] std::optional<engine::utils::Rect> getLimitBounds1() const { return limit_bounds_; } // 获取限制相机移动范围；
+    [[nodiscard]] glm::vec2 getPosition() const { return position_; }                                 // 获取相机坐标；
+    [[nodiscard]] std::optional<engine::utils::Rect> getLimitBounds() const { return limit_bounds_; } // 获取限制相机移动范围；
     [[nodiscard]] glm::vec2 getViewportSize() const { return viewport_size_; }                         // 获取视窗大小
     [[nodiscard]] engine::component::TransformComponent* getTarget() const;                            // 获取跟随目标变换的组件；
 

@@ -10,11 +10,12 @@
 #include <map>
 #include <glm/vec2.hpp>
 
-#include "../utils/action.h"
+#include "../../game/component/ai_component.h"
 #include "../utils/math.h"
 
 namespace engine::component {
 class AnimationComponent;
+class AudioComponent;
 struct TileInfo;
 enum class TileType;
 }
@@ -114,6 +115,13 @@ private:
      * @return 瓦片类型
      */
     engine::component::TileType getTileTypeById(const nlohmann::json& tileset_json, int local_id);
+
+    /**
+     * @brief 添加音效到指定的 audioComponent
+     * @param sound_json 音效json数据
+     * @param audio_component  AudioComponent对象
+     */
+    void addSound(const nlohmann::json& sound_json, engine::component::AudioComponent& audio_component);
 
 private:
     std::string map_path_{};                     // 地图路径

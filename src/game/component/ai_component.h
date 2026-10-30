@@ -8,6 +8,10 @@
 #include "ai/jump_behavior.h"
 
 namespace engine::component {
+class AudioComponent;
+}
+
+namespace engine::component {
 class AnimationComponent;
 class SpriteComponent;
 class PhysicsComponent;
@@ -38,7 +42,7 @@ public:
     [[nodiscard]] engine::component::AnimationComponent& getAnimationComponent() const { return *animation_component_; }
     [[nodiscard]] engine::component::PhysicsComponent& getPhysicsComponent() const { return *physics_component_; }
     [[nodiscard]] engine::component::SpriteComponent& getSpriteComponent() const { return *sprite_component_; }
-
+    [[nodiscard]] engine::component::AudioComponent& getAudioComponent() const { return *audio_component_; }
     AiComponent(const AiComponent& other) = delete;
     AiComponent(AiComponent&& other) noexcept = delete;
     AiComponent& operator=(const AiComponent& other) = delete;
@@ -53,6 +57,7 @@ private:
     engine::component::AnimationComponent* animation_component_;
     engine::component::PhysicsComponent* physics_component_;
     engine::component::SpriteComponent* sprite_component_;
+    engine::component::AudioComponent* audio_component_;
 
     std::unique_ptr<game::component::ai::AiBehavior> current_behavior_{nullptr};
 };

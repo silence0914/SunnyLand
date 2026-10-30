@@ -9,6 +9,7 @@
 #include "../../engine/component/sprite_component.h"
 #include "../../engine/component/animation_component.h"
 #include "../../engine/component/health_component.h"
+#include "../../engine/component/audio_component.h"
 #include "../../engine/log/my_log.h"
 
 namespace game {
@@ -44,6 +45,7 @@ void AiComponent::init() {
     physics_component_ = owner_->getComponent<engine::component::PhysicsComponent>();
     sprite_component_ = owner_->getComponent<engine::component::SpriteComponent>();
     animation_component_ = owner_->getComponent<engine::component::AnimationComponent>();
+    audio_component_ = owner_->getComponent<engine::component::AudioComponent>();
 
     if (!transform_component_ || !physics_component_ || !sprite_component_ || !animation_component_) {
         mylog::MyLog{}.
