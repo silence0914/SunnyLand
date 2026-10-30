@@ -22,6 +22,7 @@
 #include "../../engine/physics/circleCollider.h"
 #include "../../engine/render/camera.h"
 #include "../../engine/scene/level_loader.h"
+#include "../../engine/scene/scene_manager.h"
 #include "../../engine/utils/action.h"
 #include "../component/ai_component.h"
 #include "../component/state/player_state.h"
@@ -30,7 +31,8 @@
 #include "../component/ai/updown_behavior.h"
 
 namespace game::scene {
-GameScene::GameScene(std::string name, engine::core::Context& context, engine::scene::SceneManager& scene_manager)
+GameScene::GameScene(const std::string& name, engine::core::Context& context,
+                     engine::scene::SceneManager& scene_manager)
     : Scene(name, context, scene_manager) {
     mylog::MyLog{}.trace("create GameScene success");
 }
@@ -87,7 +89,8 @@ void GameScene::clean() {
 bool GameScene::initLevel() {
     // 加载管卡；
     engine::scene::LevelLoader level_loader;
-    if (!level_loader.loadLevel("assets/maps/level1.tmj", *this)) {
+    auto level_path = levelNameToPath(scene_name_);
+    if (!level_loader.loadLevel(level_path, *this)) {
         mylog::MyLog{}.error("'{}' initLevel failed;loadLevel failed;", scene_name_);
     }
 
@@ -179,21 +182,25 @@ void GameScene::handleObjectCollisions() {
         auto* obj1 = collision_pair.first;
         auto* obj2 = collision_pair.second;
 
+        engine::object::GameObject* player{nullptr};
+        engine::object::GameObject* other{nullptr};
         if (obj1->getName() == "player") {
-            if (obj2->getTag() == "enemy") {
-                playerVsEnemyCollision(*obj1, *obj2);
-            } else if (obj2->getTag() == "item") {
-                playerVsItemCollision(*obj1, *obj2);
-            } else if (obj2->getTag() == "hazard") {
-                obj1->getComponent<game::component::PlayerComponent>()->takeDamage(1);
-            }
+            player = obj1;
+            other = obj2;
         } else if (obj2->getName() == "player") {
-            if (obj1->getTag() == "enemy") {
-                playerVsEnemyCollision(*obj2, *obj1);
-            } else if (obj1->getTag() == "item") {
-                playerVsItemCollision(*obj2, *obj1);
-            } else if (obj1->getTag() == "hazard") {
-                obj2->getComponent<game::component::PlayerComponent>()->takeDamage(1);
+            player = obj2;
+            other = obj1;
+        }
+
+        if (player) {
+            if (other->getTag() == "enemy") {
+                playerVsEnemyCollision(*player, *other);
+            } else if (other->getTag() == "item") {
+                playerVsItemCollision(*player, *other);
+            } else if (other->getTag() == "hazard") {
+                player->getComponent<game::component::PlayerComponent>()->takeDamage(1);
+            } else if (other->getTag() == "next_level") {
+                toNextLevel(other);
             }
         }
     }
@@ -242,6 +249,12 @@ void GameScene::playerVsItemCollision(engine::object::GameObject& player, engine
     auto item_aabb = item.getComponent<engine::component::ColliderComponent>()->getWorldAABB();
     createEffect(item_aabb.getCenter(), item.getTag());
     context_.getAudioPlayer().playSound("assets/audio/poka01.mp3");
+}
+
+void GameScene::toNextLevel(engine::object::GameObject* trigger) {
+    auto scene_name = trigger->getName();
+    auto next_scene = std::make_unique<game::scene::GameScene>(scene_name, context_, scene_manager_);
+    scene_manager_.requestReplaceScene(std::move(next_scene));
 }
 
 void GameScene::createEffect(const glm::vec2& center_pos, const std::string& tag) {

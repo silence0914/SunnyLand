@@ -69,6 +69,9 @@ constexpr static std::string_view FRAMES{"frames"};
 constexpr static std::string_view ANIMATION{"animation"};
 constexpr static std::string_view LADDER{"ladder"};
 constexpr static std::string_view SOUND{"sound"};
+constexpr static std::string_view POINT{"point"};
+constexpr static std::string_view ELLIPSE{"ellipse"};
+constexpr static std::string_view POLYGON{"polygon"};
 
 
 bool LevelLoader::loadLevel(const std::string& map_path, Scene& scene) {
@@ -192,9 +195,35 @@ void LevelLoader::loadObjectLayer(const nlohmann::json& layer_json, Scene& scene
     for (const auto& object: objects) {
         auto gid = object.value(GID, 0);
         if (gid == 0) {
-            // gid 不存在 代表需要自行处理；
-            // TODO;
-            continue;
+            if (object.value(POINT, false)) {
+                continue;
+            } else if (object.value(ELLIPSE, false)) {
+                continue;
+            } else if (object.value(POLYGON, false)) {} else {
+                // 创建游戏对象并添加组件
+                const std::string& object_name = object.value(NAME, NONE);
+                std::unique_ptr<object::GameObject> game_object = std::make_unique<
+                    engine::object::GameObject>(object_name);
+                // 获取TransformComponent 相关信息
+                auto position = glm::vec2(object.value(X, 0.0f), object.value(Y, 0.0f));
+                auto dst_size = glm::vec2(object.value(WIDTH, 0.0f), object.value(HEIGHT, 0.0f));
+                auto rotation = object.value(ROTATION, 0.0f);
+                game_object->addComponent<engine::component::TransformComponent>(position, glm::vec2{1.0f}, rotation);
+
+                // 添加碰撞组件和物理组件
+                auto collider = std::make_unique<engine::physics::AABBCollider>(dst_size);
+                engine::component::ColliderComponent* cc =
+                        game_object->addComponent<engine::component::ColliderComponent>(std::move(collider));
+                cc->setTrigger(object.value("trigger", true));
+                game_object->addComponent<engine::component::PhysicsComponent>
+                        (scene.getContext().getPhysicsEngine(), false);
+
+                if (auto tag = getTileProperty<std::string>(object, "tag"); tag) {
+                    game_object->setTag(tag.value());
+                }
+
+                scene.addGameObject(std::move(game_object));
+            }
         }
         // 根据gid获取信息；
         auto tile_info = getTileInfoByGid(gid);

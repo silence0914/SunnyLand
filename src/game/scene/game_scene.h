@@ -15,7 +15,7 @@ class GameObject;
 namespace game::scene {
 class GameScene final : public engine::scene::Scene {
 public:
-    GameScene(std::string name, engine::core::Context& context, engine::scene::SceneManager& scene_manager);
+    GameScene(const std::string& name, engine::core::Context& context, engine::scene::SceneManager& scene_manager);
     ~GameScene() = default;
 
     GameScene(const GameScene& other) = delete;
@@ -39,6 +39,8 @@ private:
     void handleTileTriggers();                                                                          // 处理瓦片触发事件；
     void playerVsEnemyCollision(engine::object::GameObject& player, engine::object::GameObject& enemy); // 玩家与敌人的碰撞
     void playerVsItemCollision(engine::object::GameObject& player, engine::object::GameObject& item);   // 玩家与道具间碰撞；
+    void toNextLevel(engine::object::GameObject* trigger);                                              // 进入下一关
+    std::string levelNameToPath(const std::string& level_name) const { return "assets/maps/" + level_name + ".tmj"; }
 
     /**
      * @brief 创建一个特效对象；
