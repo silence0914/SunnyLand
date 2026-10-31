@@ -24,6 +24,7 @@ class ResourceManager;
 namespace engine::render {
 class Renderer;
 class Camera;
+class TextRenderer;
 }
 
 namespace engine::core {
@@ -38,8 +39,9 @@ public:
             engine::render::Renderer& renderer,
             engine::input::InputManager& input_manager,
             engine::resource::ResourceManager& resource_manager,
-            engine::physics::PhysicsEngine&,
-            engine::audio::AudioPlayer&
+            engine::physics::PhysicsEngine& physics_engine,
+            engine::audio::AudioPlayer& audio_player,
+            engine::render::TextRenderer& text_renderer
     );
 
     ~Context() = default;
@@ -56,6 +58,7 @@ public:
     [[nodiscard]] engine::resource::ResourceManager& getResourceManager() const { return resource_manager_; }
     [[nodiscard]] engine::physics::PhysicsEngine& getPhysicsEngine() const { return physics_engine_; }
     [[nodiscard]] engine::audio::AudioPlayer& getAudioPlayer() const { return audio_player_; }
+    [[nodiscard]] engine::render::TextRenderer& getTextRenderer() const { return text_renderer_; }
 
 private:
     engine::render::Camera& camera_;
@@ -64,6 +67,7 @@ private:
     engine::resource::ResourceManager& resource_manager_;
     engine::physics::PhysicsEngine& physics_engine_;
     engine::audio::AudioPlayer& audio_player_;
+    engine::render::TextRenderer& text_renderer_;
 };
 } // core
 // engine

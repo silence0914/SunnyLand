@@ -24,6 +24,7 @@
 #include "../object/game_object.h"
 #include "../component/transform_component.h"
 #include "../physics/physics_engine.h"
+#include "../render/text_renderer.h"
 #include "../scene/scene.h"
 #include "../scene/scene_manager.h"
 
@@ -63,6 +64,7 @@ bool GameApp::init() {
     if (!initSceneManager()) { return false; }
     if (!initPhysicsEngine()) { return false; }
     if (!initAudioPlayer()) { return false; }
+    if (!initTextRenderer()) { return false; }
 
     if (!initContext()) { return false; }
     auto scene = std::make_unique<game::scene::GameScene>(*context_, *scene_manager_);
@@ -217,7 +219,7 @@ bool GameApp::initInputManager() {
 bool GameApp::initContext() {
     try {
         context_ = std::make_unique<engine::core::Context>(*camera_, *renderer_, *input_manager_, *resource_manager_,
-                                                           *physics_engine_, *audio_player_);
+                                                           *physics_engine_, *audio_player_, *text_renderer_);
     } catch (const std::exception& e) {
         spdlog::error("initContext failed; error : {}", e.what());
         return false;
@@ -250,6 +252,16 @@ bool GameApp::initAudioPlayer() {
         audio_player_ = std::make_unique<engine::audio::AudioPlayer>(*resource_manager_);
     } catch (const std::exception& e) {
         spdlog::error("initAudioPlayer failed;error : {}", e.what());
+        return false;
+    }
+    return true;
+}
+
+bool GameApp::initTextRenderer() {
+    try {
+        text_renderer_ = std::make_unique<engine::render::TextRenderer>(sdl_renderer_, *resource_manager_);
+    } catch (const std::exception& e) {
+        spdlog::error("initTextRenderer failed;error : {}", e.what());
         return false;
     }
     return true;

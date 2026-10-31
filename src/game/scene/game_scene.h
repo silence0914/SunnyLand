@@ -56,7 +56,7 @@ private:
      */
     void createEffect(const glm::vec2& center_pos, const std::string& tag);
 
-    void testSaveAndLoad();
+    void testTextRenderer();
 private:
     engine::object::GameObject* player_{nullptr};
     std::shared_ptr<game::data::SessionData> game_session_data_; // 场景间数据共享；

@@ -23,6 +23,7 @@
 #include "../../engine/physics/aabb_collider.h"
 #include "../../engine/physics/circleCollider.h"
 #include "../../engine/render/camera.h"
+#include "../../engine/render/text_renderer.h"
 #include "../../engine/scene/level_loader.h"
 #include "../../engine/scene/scene_manager.h"
 #include "../../engine/utils/action.h"
@@ -78,7 +79,6 @@ void GameScene::init() {
 
 void GameScene::handleInput() {
     Scene::handleInput();
-    testSaveAndLoad();
 }
 
 void GameScene::update(const float dt) {
@@ -89,6 +89,7 @@ void GameScene::update(const float dt) {
 
 void GameScene::render() {
     Scene::render();
+    testTextRenderer();
 }
 
 void GameScene::clean() {
@@ -311,16 +312,13 @@ void GameScene::createEffect(const glm::vec2& center_pos, const std::string& tag
     safeAddGameObject(std::move(effect_obj));       // 安全添加特效对象；
 }
 
-void GameScene::testSaveAndLoad() {
-    auto& input_manager = context_.getInputManager();
-    if (input_manager.isActionPressed(std::string{engine::utils::action::ATTACK})) {
-        game_session_data_->saveToFile("assets/save.json");
-    }
-    if (input_manager.isActionPressed(std::string{engine::utils::action::PAUSE})) {
-        game_session_data_->loadFromFile("assets/save.json");
-        spdlog::info("当前生命值: {}", game_session_data_->getCurrentHealth());
-        spdlog::info("当前得分: {}", game_session_data_->getCurrentScore());
-    }
+void GameScene::testTextRenderer() {
+    auto& text_renderer = context_.getTextRenderer();
+    const auto& camera = context_.getCamera();
+    text_renderer.drawUiText("UI Text", "assets/fonts/VonwaonBitmap-16px.ttf",
+                             32, glm::vec2{100.0f}, {0, 1.0f, 0, 1.0f});
+    text_renderer.drawText(camera, "map text", "assets/fonts/VonwaonBitmap-16px.ttf",
+                           32, glm::vec2{200.0f});
 }
 } // scene
 // game

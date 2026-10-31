@@ -27,6 +27,7 @@ class ResourceManager;
 namespace engine::render {
 class Camera;
 class Renderer;
+class TextRenderer;
 }
 
 namespace engine::input {
@@ -75,6 +76,7 @@ private:
     [[nodiscard]] bool initSceneManager();
     [[nodiscard]] bool initPhysicsEngine();
     [[nodiscard]] bool initAudioPlayer();
+    [[nodiscard]] bool initTextRenderer();
 
 private:
     SDL_Window* window_{nullptr};
@@ -91,6 +93,7 @@ private:
     std::unique_ptr<engine::scene::SceneManager> scene_manager_;          // 场景管理
     std::unique_ptr<engine::physics::PhysicsEngine> physics_engine_;      // 物理引擎
     std::unique_ptr<engine::audio::AudioPlayer> audio_player_;            // 音频播放器
+    std::unique_ptr<engine::render::TextRenderer> text_renderer_;         // 文本渲染器
 };
 }
 
