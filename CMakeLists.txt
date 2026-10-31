@@ -135,6 +135,8 @@ add_executable(${TARGET}
         src/engine/audio/audio_player.h
         src/engine/component/audio_component.cpp
         src/engine/component/audio_component.h
+        src/game/data/session_data.cpp
+        src/game/data/session_data.h
 
 )
 

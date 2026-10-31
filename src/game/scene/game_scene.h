@@ -12,10 +12,16 @@ namespace engine::object {
 class GameObject;
 }
 
+namespace game::data {
+class SessionData;
+}
+
 namespace game::scene {
 class GameScene final : public engine::scene::Scene {
 public:
-    GameScene(const std::string& name, engine::core::Context& context, engine::scene::SceneManager& scene_manager);
+    GameScene(engine::core::Context& context,
+              engine::scene::SceneManager& scene_manager,
+              std::shared_ptr<game::data::SessionData> data = nullptr);
     ~GameScene() = default;
 
     GameScene(const GameScene& other) = delete;
@@ -37,6 +43,7 @@ private:
 
     void handleObjectCollisions();                                                                      // 处理游戏对象间的碰撞
     void handleTileTriggers();                                                                          // 处理瓦片触发事件；
+    void handlePlayerDamage(int damage);                                                                // 处理玩家受伤
     void playerVsEnemyCollision(engine::object::GameObject& player, engine::object::GameObject& enemy); // 玩家与敌人的碰撞
     void playerVsItemCollision(engine::object::GameObject& player, engine::object::GameObject& item);   // 玩家与道具间碰撞；
     void toNextLevel(engine::object::GameObject* trigger);                                              // 进入下一关
@@ -49,8 +56,10 @@ private:
      */
     void createEffect(const glm::vec2& center_pos, const std::string& tag);
 
+    void testSaveAndLoad();
 private:
     engine::object::GameObject* player_{nullptr};
+    std::shared_ptr<game::data::SessionData> game_session_data_; // 场景间数据共享；
 };
 } // scene
 

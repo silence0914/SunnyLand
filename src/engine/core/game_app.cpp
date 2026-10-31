@@ -65,7 +65,7 @@ bool GameApp::init() {
     if (!initAudioPlayer()) { return false; }
 
     if (!initContext()) { return false; }
-    auto scene = std::make_unique<game::scene::GameScene>("level1", *context_, *scene_manager_);
+    auto scene = std::make_unique<game::scene::GameScene>(*context_, *scene_manager_);
     scene_manager_->requestPushScene(std::move(scene));
 
     if (!initTime()) { return false; }

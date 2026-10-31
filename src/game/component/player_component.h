@@ -47,7 +47,7 @@ public:
     [[nodiscard]] engine::component::HealthComponent& getHealthComponent() const { return *health_component_; }
     [[nodiscard]] engine::component::AudioComponent& getAudioComponent() const { return *audio_component_; }
 
-    [[nodiscard]] bool isIsDead() const { return is_dead_; }                     // 是否死亡
+    [[nodiscard]] bool isDead() const { return is_dead_; }                     // 是否死亡
     [[nodiscard]] float getMoveForce() const { return move_force_; }             // 水平移动力
     [[nodiscard]] float getMaxSpeed() const { return max_speed_; }               // 最大移动速度
     [[nodiscard]] float getFrictionFactor() const { return friction_factor_; }   // 摩擦系数

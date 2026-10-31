@@ -4,6 +4,8 @@
 
 #include "game_scene.h"
 
+#include <utility>
+
 #include "../../engine/audio/audio_player.h"
 #include "../../engine/object/game_object.h"
 #include "../../engine/component/collider_component.h"
@@ -29,11 +31,17 @@
 #include "../component/player_component.h"
 #include "../component/ai/patrol_behavior.h"
 #include "../component/ai/updown_behavior.h"
+#include "../data/session_data.h"
 
 namespace game::scene {
-GameScene::GameScene(const std::string& name, engine::core::Context& context,
-                     engine::scene::SceneManager& scene_manager)
-    : Scene(name, context, scene_manager) {
+GameScene::GameScene(engine::core::Context& context,
+                     engine::scene::SceneManager& scene_manager,
+                     std::shared_ptr<game::data::SessionData> data)
+    : Scene("GameScene", context, scene_manager), game_session_data_(std::move(data)) {
+    if (!game_session_data_) {
+        game_session_data_ = std::make_shared<game::data::SessionData>();
+    }
+
     mylog::MyLog{}.trace("create GameScene success");
 }
 
@@ -70,6 +78,7 @@ void GameScene::init() {
 
 void GameScene::handleInput() {
     Scene::handleInput();
+    testSaveAndLoad();
 }
 
 void GameScene::update(const float dt) {
@@ -89,7 +98,7 @@ void GameScene::clean() {
 bool GameScene::initLevel() {
     // 加载管卡；
     engine::scene::LevelLoader level_loader;
-    auto level_path = levelNameToPath(scene_name_);
+    auto level_path = game_session_data_->getMapPath();
     if (!level_loader.loadLevel(level_path, *this)) {
         mylog::MyLog{}.error("'{}' initLevel failed;loadLevel failed;", scene_name_);
     }
@@ -105,6 +114,7 @@ bool GameScene::initLevel() {
         engine::component::TileLayerComponent>();
     if (tile_layer == nullptr) {
         mylog::MyLog{}.error("'{}' initLevel failed;findTileLayerComponent failed;", scene_name_);
+        return false;
     }
 
     // 注册到物理层
@@ -217,6 +227,15 @@ void GameScene::handleTileTriggers() {
     }
 }
 
+void GameScene::handlePlayerDamage(int damage) {
+    auto player_component = player_->getComponent<game::component::PlayerComponent>();
+    if (!player_component->takeDamage(damage)) { return; }
+    if (player_component->isDead()) {
+        mylog::MyLog{}.info("player dead");
+    }
+    game_session_data_->setCurrentHealth(player_component->getHealthComponent().getCurrentHealth());
+}
+
 void GameScene::playerVsEnemyCollision(engine::object::GameObject& player, engine::object::GameObject& enemy) {
     auto player_aabb = player.getComponent<engine::component::ColliderComponent>()->getWorldAABB();
     auto enemy_aabb = enemy.getComponent<engine::component::ColliderComponent>()->getWorldAABB();
@@ -235,16 +254,19 @@ void GameScene::playerVsEnemyCollision(engine::object::GameObject& player, engin
         }
         player.getComponent<engine::component::PhysicsComponent>()->setVelocityY(-300.f); // 向上跳起；
         context_.getAudioPlayer().playSound("assets/audio/punch2a.mp3");
+        game_session_data_->addScore(10); // 加分
     } else {
         // 踩踏失败； 受到伤害；
-        player.getComponent<game::component::PlayerComponent>()->takeDamage(1);
+        handlePlayerDamage(1);
     }
 }
 
 void GameScene::playerVsItemCollision(engine::object::GameObject& player, engine::object::GameObject& item) {
     if (item.getName() == "fruit") {
         player.getComponent<engine::component::HealthComponent>()->heal(1); // 回血；
-    } else if (item.getName() == "gem") {}
+    } else if (item.getName() == "gem") {
+        game_session_data_->addScore(5);
+    }
     item.setNeedRemove(true);
     auto item_aabb = item.getComponent<engine::component::ColliderComponent>()->getWorldAABB();
     createEffect(item_aabb.getCenter(), item.getTag());
@@ -253,7 +275,9 @@ void GameScene::playerVsItemCollision(engine::object::GameObject& player, engine
 
 void GameScene::toNextLevel(engine::object::GameObject* trigger) {
     auto scene_name = trigger->getName();
-    auto next_scene = std::make_unique<game::scene::GameScene>(scene_name, context_, scene_manager_);
+    auto map_path = levelNameToPath(scene_name);
+    game_session_data_->setNextLevel(map_path);
+    auto next_scene = std::make_unique<game::scene::GameScene>(context_, scene_manager_, game_session_data_);
     scene_manager_.requestReplaceScene(std::move(next_scene));
 }
 
@@ -285,6 +309,18 @@ void GameScene::createEffect(const glm::vec2& center_pos, const std::string& tag
     animation_component->setIsOneShotRemoval(true); // 动画结束后删除；
     animation_component->playAnimation("effect");   // 播放动画
     safeAddGameObject(std::move(effect_obj));       // 安全添加特效对象；
+}
+
+void GameScene::testSaveAndLoad() {
+    auto& input_manager = context_.getInputManager();
+    if (input_manager.isActionPressed(std::string{engine::utils::action::ATTACK})) {
+        game_session_data_->saveToFile("assets/save.json");
+    }
+    if (input_manager.isActionPressed(std::string{engine::utils::action::PAUSE})) {
+        game_session_data_->loadFromFile("assets/save.json");
+        spdlog::info("当前生命值: {}", game_session_data_->getCurrentHealth());
+        spdlog::info("当前得分: {}", game_session_data_->getCurrentScore());
+    }
 }
 } // scene
 // game

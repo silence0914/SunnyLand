@@ -44,8 +44,8 @@ TileType TileLayerComponent::getTileTypeAt(glm::ivec2 pos) const {
 
 TileType TileLayerComponent::getTileTypeAtWorldPos(glm::vec2 world_pos) const {
     glm::vec2 relative_pos = world_pos - offset_;
-    int x = static_cast<int>(std::floor(world_pos.x / tile_size_.x));
-    int y = static_cast<int>(std::floor(world_pos.y / tile_size_.y));
+    int x = static_cast<int>(std::floor(world_pos.x / static_cast<float>(tile_size_.x)));
+    int y = static_cast<int>(std::floor(world_pos.y / static_cast<float>(tile_size_.y)));
     return getTileTypeAt({x, y});
 }
 
@@ -76,17 +76,18 @@ void TileLayerComponent::render(engine::core::Context& context) {
                 context.getRenderer().drawSprite(context.getCamera(), tile_info.sprite, tile_pos);
 
                 if (tile_info.type == TileType::HAZARD) {
-                    context.getRenderer().setDrawColor(255,0,0);
-                    context.getRenderer().drawRect(context.getCamera(),tile_pos,tile_info.sprite);
+                    context.getRenderer().setDrawColor(255, 0, 0);
+                    context.getRenderer().drawRect(context.getCamera(), tile_pos, tile_info.sprite);
                 }
-
             }
         }
     }
 }
 
 void TileLayerComponent::clear() {
-    // physics_engine_->unregisterComponent(*this);
+    if (physics_engine_) {
+        physics_engine_->unregisterCollisionLayer(*this);
+    }
 }
 } // component
 } // engine
