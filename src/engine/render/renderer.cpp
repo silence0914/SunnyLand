@@ -8,7 +8,10 @@
 #include <stdexcept>
 
 #include "camera.h"
+#include "../log/log_manager.h"
+#include "../log/my_log.h"
 #include "../resource/resource_manager.h"
+#include "../utils/math.h"
 
 namespace engine {
 namespace render {
@@ -140,6 +143,14 @@ void Renderer::drawUISprite(const Sprite& sprite, const glm::vec2& position, con
                                   sprite.isIsFlipped() ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE)) {
         spdlog::error("drawUISprite failed : SDL_RenderTextureRotated failed; texture id = {},sdl_error = {}",
                       sprite.getTextureId(), SDL_GetError());
+    }
+}
+
+void Renderer::drawUiFilledRect(const engine::utils::Rect& rect, const engine::utils::FColor& color) {
+    setDrawColorFloat(color.r, color.g, color.b, color.a);
+    SDL_FRect sdl_rect{rect.position.x, rect.position.y, rect.size.x, rect.size.y};
+    if (!SDL_RenderFillRect(renderer_, &sdl_rect)) {
+        mylog::MyLog{}.error("drawUiFilledRect failed; sdl_error = {}", SDL_GetError());
     }
 }
 

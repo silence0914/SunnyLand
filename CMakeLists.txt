@@ -139,6 +139,12 @@ add_executable(${TARGET}
         src/game/data/session_data.h
         src/engine/render/text_renderer.cpp
         src/engine/render/text_renderer.h
+        src/engine/ui/ui_element.cpp
+        src/engine/ui/ui_element.h
+        src/engine/ui/ui_manager.cpp
+        src/engine/ui/ui_manager.h
+        src/engine/ui/ui_panel.cpp
+        src/engine/ui/ui_panel.h
 
 )
 

@@ -40,6 +40,7 @@ private:
     [[nodiscard]] bool initLevel();
     [[nodiscard]] bool initPlayer();
     [[nodiscard]] bool initEnemyAndItem();
+    [[nodiscard]] bool initUi();
 
     void handleObjectCollisions();                                                                      // 处理游戏对象间的碰撞
     void handleTileTriggers();                                                                          // 处理瓦片触发事件；
@@ -55,8 +56,6 @@ private:
      * @param tag 特效标签
      */
     void createEffect(const glm::vec2& center_pos, const std::string& tag);
-
-    void testTextRenderer();
 private:
     engine::object::GameObject* player_{nullptr};
     std::shared_ptr<game::data::SessionData> game_session_data_; // 场景间数据共享；

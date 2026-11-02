@@ -142,6 +142,9 @@ bool GameApp::initSDL() {
         return false;
     }
 
+    // 设置渲染器支持透明色；
+    SDL_SetRenderDrawBlendMode(sdl_renderer_,SDL_BLENDMODE_BLEND);
+
     int vsync_mode = config_->vsync_enabled_ ? SDL_RENDERER_VSYNC_ADAPTIVE : SDL_RENDERER_VSYNC_DISABLED;
     SDL_SetRenderVSync(sdl_renderer_, vsync_mode);
 

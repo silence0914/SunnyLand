@@ -44,6 +44,7 @@ bool checkCollision(const engine::component::ColliderComponent& a, const engine:
         auto nearest_point = glm::clamp(a_center, b_pos, b_pos + b_size); // 计算圆心到AABB的最邻近点
         return checkPointInCircle(nearest_point, a_center, a_radius);
     }
+    return false;
 }
 
 bool checkCircleOverlap(const glm::vec2& a_center_pos, const float a_radius, const glm::vec2& b_center_pos,

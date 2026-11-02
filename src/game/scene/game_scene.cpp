@@ -26,6 +26,8 @@
 #include "../../engine/render/text_renderer.h"
 #include "../../engine/scene/level_loader.h"
 #include "../../engine/scene/scene_manager.h"
+#include "../../engine/ui/ui_manager.h"
+#include "../../engine/ui/ui_panel.h"
 #include "../../engine/utils/action.h"
 #include "../component/ai_component.h"
 #include "../component/state/player_state.h"
@@ -58,13 +60,19 @@ void GameScene::init() {
     if (!initPlayer()) {
         mylog::MyLog{}.error("player init failed");
         context_.getInputManager().setShouldQuit(true);
-        render();
+        return;
     }
 
     if (!initEnemyAndItem()) {
         mylog::MyLog{}.error("enemy and item init failed");
         context_.getInputManager().setShouldQuit(true);
-        render();
+        return;
+    }
+
+    if (!initUi()) {
+        mylog::MyLog{}.error("ui init failed");
+        context_.getInputManager().setShouldQuit(true);
+        return;
     }
 
     // 设置音量
@@ -89,7 +97,6 @@ void GameScene::update(const float dt) {
 
 void GameScene::render() {
     Scene::render();
-    testTextRenderer();
 }
 
 void GameScene::clean() {
@@ -185,6 +192,15 @@ bool GameScene::initEnemyAndItem() {
         }
     }
     return success;
+}
+
+bool GameScene::initUi() {
+    if (!ui_manager_->init(glm::vec2(context_.getCamera().getViewportSize()))) { return false; }
+    ui_manager_->addElement(std::make_unique<engine::ui::UiPanel>
+                            (glm::vec2{100.0f, 100.0f},
+                             glm::vec2{300.0f, 100.0f},
+                             engine::utils::FColor{0.5f, 0.5f, 0.5f, 0.5f}));
+    return true;
 }
 
 void GameScene::handleObjectCollisions() {
@@ -310,15 +326,6 @@ void GameScene::createEffect(const glm::vec2& center_pos, const std::string& tag
     animation_component->setIsOneShotRemoval(true); // 动画结束后删除；
     animation_component->playAnimation("effect");   // 播放动画
     safeAddGameObject(std::move(effect_obj));       // 安全添加特效对象；
-}
-
-void GameScene::testTextRenderer() {
-    auto& text_renderer = context_.getTextRenderer();
-    const auto& camera = context_.getCamera();
-    text_renderer.drawUiText("UI Text", "assets/fonts/VonwaonBitmap-16px.ttf",
-                             32, glm::vec2{100.0f}, {0, 1.0f, 0, 1.0f});
-    text_renderer.drawText(camera, "map text", "assets/fonts/VonwaonBitmap-16px.ttf",
-                           32, glm::vec2{200.0f});
 }
 } // scene
 // game

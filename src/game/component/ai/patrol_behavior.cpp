@@ -29,7 +29,7 @@ void PatrolBehavior::enter(game::component::AiComponent& ai_component) {
     ai_component.getPhysicsComponent().setVelocityX(moving_right_ ? move_speed_ : -move_speed_);
 }
 
-void PatrolBehavior::update(const float x, game::component::AiComponent& ai_component) {
+void PatrolBehavior::update(const float, game::component::AiComponent& ai_component) {
     auto& physics_component = ai_component.getPhysicsComponent();
     auto& sprite_component = ai_component.getSpriteComponent();
     auto& transform_component = ai_component.getTransformComponent();

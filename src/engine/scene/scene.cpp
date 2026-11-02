@@ -10,13 +10,18 @@
 #include "../object/game_object.h"
 #include "../physics/physics_engine.h"
 #include "../render/camera.h"
+#include "../ui/ui_manager.h"
+#include "../ui/ui_panel.h"
 
 namespace engine {
 namespace scene {
 Scene::Scene(std::string scene_name, engine::core::Context& context, engine::scene::SceneManager& scene_manager)
-    : scene_name_(std::move(scene_name)), context_(context), scene_manager_(scene_manager) {
+    : scene_name_(std::move(scene_name)), context_(context), scene_manager_(scene_manager),
+      ui_manager_(std::make_unique<engine::ui::UiManager>()) {
     spdlog::trace("create scene completion");
 }
+
+Scene::~Scene() = default;
 
 void Scene::init() {
     is_initialized_ = true;
@@ -27,6 +32,8 @@ void Scene::handleInput() {
     if (!is_initialized_) {
         return;
     }
+    if (ui_manager_->handleInput(context_)) { return; };
+
     for (const auto& game_object: game_objects_) {
         if (game_object->isNeedRemove()) { break; }
         game_object->handleInput(context_);
@@ -59,9 +66,11 @@ void Scene::update(const float dt) {
     // 更新相机
     context_.getCamera().update(dt);
 
-    for (auto & object : game_objects_) {
-        object->update(dt,context_);
+    for (auto& object: game_objects_) {
+        object->update(dt, context_);
     }
+
+    ui_manager_->update(dt, context_);
 
     processPendingAdditions();
 }
@@ -71,6 +80,7 @@ void Scene::render() {
     for (const auto& game_object: game_objects_) {
         game_object->render(context_);
     }
+    ui_manager_->render(context_);
 }
 
 void Scene::clean() {

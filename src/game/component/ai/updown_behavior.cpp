@@ -33,7 +33,7 @@ void UpdownBehavior::enter(game::component::AiComponent& ai_component) {
     ai_component.getPhysicsComponent().setUseGravity(false);
 }
 
-void UpdownBehavior::update(const float x, game::component::AiComponent& ai_component) {
+void UpdownBehavior::update(const float, game::component::AiComponent& ai_component) {
     auto& physics_component = ai_component.getPhysicsComponent();
     auto& transform_component = ai_component.getTransformComponent();
     auto current_y = transform_component.getPosition().y;

@@ -15,6 +15,13 @@ struct Rect {
 
     glm::vec2 getCenter() { return position + size / 2.0f; }
 };
+
+struct FColor {
+    float r;
+    float g;
+    float b;
+    float a;
+};
 }
 
 #endif //MATH_H

@@ -10,6 +10,12 @@
 #include <string>
 #include <chrono>
 
+#include "../ui/ui_element.h"
+
+
+namespace engine::ui {
+class UiManager;
+}
 
 namespace engine::object {
 class GameObject;
@@ -36,7 +42,7 @@ namespace engine::scene {
 class Scene {
 public:
     Scene(std::string scene_name, engine::core::Context& context, engine::scene::SceneManager& scene_manager);
-    virtual ~Scene() = default;
+    virtual ~Scene();
 
     Scene(const Scene& other) = delete;
     Scene(Scene&& other) noexcept = delete;
@@ -74,10 +80,11 @@ public:
 protected:
     void processPendingAdditions(); // pending_additions 中的对象加入到 game_objects 中
 protected:
-    std::string scene_name_{};                   // 场景名；
-    engine::core::Context& context_;             // 上下文
-    bool is_initialized_{false};                  // 是否初始化
-    engine::scene::SceneManager& scene_manager_; // 场景管理器
+    std::string scene_name_{};                          // 场景名；
+    engine::core::Context& context_;                    // 上下文
+    bool is_initialized_{false};                        // 是否初始化
+    engine::scene::SceneManager& scene_manager_;        // 场景管理器
+    std::unique_ptr<engine::ui::UiManager> ui_manager_; // 场景ui管理；
 
     std::vector<std::unique_ptr<engine::object::GameObject> > game_objects_;     // 场景中的对象；
     std::vector<std::unique_ptr<engine::object::GameObject> > pending_additions; // 待添加场景

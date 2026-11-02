@@ -7,6 +7,11 @@
 #include <glm/vec2.hpp>
 #include "sprite.h"
 
+namespace engine::utils {
+struct FColor;
+struct Rect;
+}
+
 struct SDL_Renderer;
 struct SDL_FRect;
 
@@ -64,6 +69,8 @@ public:
      */
     void drawUISprite(const Sprite& sprite, const glm::vec2& position,
                       const std::optional<glm::vec2>& size = std::nullopt);
+
+    void drawUiFilledRect(const engine::utils::Rect& rect, const engine::utils::FColor& color);
 
     void drawRect(const engine::render::Camera& camera, const glm::vec2& world_pos,const glm::vec2& size);
     void drawRect(const engine::render::Camera& camera, const glm::vec2& world_pos,const Sprite& sprite);
