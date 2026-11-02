@@ -41,7 +41,7 @@ void TextRenderer::close() {
 }
 
 void TextRenderer::drawUiText(const std::string& text, const std::string& font_id, int font_size,
-                              const glm::vec2& position, const SDL_FColor& color) {
+                              const glm::vec2& position, const engine::utils::FColor& color) {
     // 获取字体
     TTF_Font* font = resource_manager_.getFont(font_id, font_size);
     if (!font) {
@@ -71,7 +71,7 @@ void TextRenderer::drawUiText(const std::string& text, const std::string& font_i
 }
 
 void TextRenderer::drawText(const engine::render::Camera& camera, const std::string& text, const std::string& font_id,
-                            int font_size, const glm::vec2& position, const SDL_FColor& color) {
+                            int font_size, const glm::vec2& position, const engine::utils::FColor& color) {
     glm::vec2 position_screen = camera.worldToScreen(position);
     drawUiText(text, font_id, font_size, position_screen, color);
 }
@@ -90,7 +90,7 @@ glm::vec2 TextRenderer::getTextSize(const std::string& text, const std::string& 
     int width, height;
     TTF_GetTextSize(temp_text_obj, &width, &height);
     TTF_DestroyText(temp_text_obj);
-    return glm::vec2{static_cast<float>(width) , static_cast<float>(height)};
+    return glm::vec2{static_cast<float>(width), static_cast<float>(height)};
 }
 } // render
 } // engine

@@ -50,7 +50,7 @@ public:
 
     void setPosition(const glm::vec2& position) { position_ = position; }
     void setSize(const glm::vec2& size) { this->size_ = size; }
-    void setVisible(bool visible) { visible_ = visible; }
+    virtual void setVisible(bool visible) { visible_ = visible; }
     void setNeedRemove(bool need_remove) { need_remove_ = need_remove; }
     void setParent(UiElement* parent) { parent_ = parent; }
 

@@ -16,7 +16,7 @@ namespace ui {
  */
 class UiPanel final : public engine::ui::UiElement {
 public:
-    UiPanel(const glm::vec2& position, const glm::vec2& size,
+    UiPanel(const glm::vec2& position = {0.0f, 0.0f}, const glm::vec2& size = {0.0f, 0.0f},
             const std::optional<engine::utils::FColor>& background_color = std::nullopt);
 
     ~UiPanel() override = default;

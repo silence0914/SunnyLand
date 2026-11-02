@@ -69,7 +69,7 @@ public:
     [[nodiscard]] engine::utils::Alignment getAlignment() const { return alignment_; }
     [[nodiscard]] glm::vec2 getSpriteSize() const { return sprite_size_; }
     [[nodiscard]] glm::vec2 getOffset() const { return offset_; }
-    [[nodiscard]] bool isFlipped() { return sprite_.isIsFlipped(); }
+    [[nodiscard]] bool isFlipped() { return sprite_.isFlipped(); }
     [[nodiscard]] bool isHidden() const { return is_hidden_; }
 
     void setSpriteById(const std::string& texture_id, const std::optional<SDL_FRect>& source_rect = std::nullopt);

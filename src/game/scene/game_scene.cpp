@@ -26,6 +26,8 @@
 #include "../../engine/render/text_renderer.h"
 #include "../../engine/scene/level_loader.h"
 #include "../../engine/scene/scene_manager.h"
+#include "../../engine/ui/ui_image.h"
+#include "../../engine/ui/ui_label.h"
 #include "../../engine/ui/ui_manager.h"
 #include "../../engine/ui/ui_panel.h"
 #include "../../engine/utils/action.h"
@@ -196,10 +198,8 @@ bool GameScene::initEnemyAndItem() {
 
 bool GameScene::initUi() {
     if (!ui_manager_->init(glm::vec2(context_.getCamera().getViewportSize()))) { return false; }
-    ui_manager_->addElement(std::make_unique<engine::ui::UiPanel>
-                            (glm::vec2{100.0f, 100.0f},
-                             glm::vec2{300.0f, 100.0f},
-                             engine::utils::FColor{0.5f, 0.5f, 0.5f, 0.5f}));
+    createScoreUi();
+    createHealthUi();
     return true;
 }
 
@@ -225,7 +225,7 @@ void GameScene::handleObjectCollisions() {
             } else if (other->getTag() == "item") {
                 playerVsItemCollision(*player, *other);
             } else if (other->getTag() == "hazard") {
-                player->getComponent<game::component::PlayerComponent>()->takeDamage(1);
+                handlePlayerDamage(1);
             } else if (other->getTag() == "next_level") {
                 toNextLevel(other);
             }
@@ -250,7 +250,8 @@ void GameScene::handlePlayerDamage(int damage) {
     if (player_component->isDead()) {
         mylog::MyLog{}.info("player dead");
     }
-    game_session_data_->setCurrentHealth(player_component->getHealthComponent().getCurrentHealth());
+    // 更新ui
+    updateHealthWithUi();
 }
 
 void GameScene::playerVsEnemyCollision(engine::object::GameObject& player, engine::object::GameObject& enemy) {
@@ -271,18 +272,18 @@ void GameScene::playerVsEnemyCollision(engine::object::GameObject& player, engin
         }
         player.getComponent<engine::component::PhysicsComponent>()->setVelocityY(-300.f); // 向上跳起；
         context_.getAudioPlayer().playSound("assets/audio/punch2a.mp3");
-        game_session_data_->addScore(10); // 加分
+        addScoreWithUi(10);
     } else {
         // 踩踏失败； 受到伤害；
         handlePlayerDamage(1);
     }
 }
 
-void GameScene::playerVsItemCollision(engine::object::GameObject& player, engine::object::GameObject& item) {
+void GameScene::playerVsItemCollision(engine::object::GameObject&, engine::object::GameObject& item) {
     if (item.getName() == "fruit") {
-        player.getComponent<engine::component::HealthComponent>()->heal(1); // 回血；
+        healWithUi(1); // 回血；
     } else if (item.getName() == "gem") {
-        game_session_data_->addScore(5);
+        addScoreWithUi(5);
     }
     item.setNeedRemove(true);
     auto item_aabb = item.getComponent<engine::component::ColliderComponent>()->getWorldAABB();
@@ -326,6 +327,70 @@ void GameScene::createEffect(const glm::vec2& center_pos, const std::string& tag
     animation_component->setIsOneShotRemoval(true); // 动画结束后删除；
     animation_component->playAnimation("effect");   // 播放动画
     safeAddGameObject(std::move(effect_obj));       // 安全添加特效对象；
+}
+
+void GameScene::createScoreUi() {
+    auto score_text = "Score: " + std::to_string(game_session_data_->getCurrentScore());
+    auto score_label = std::make_unique<engine::ui::UiLabel>(context_.getTextRenderer(), score_text,
+                                                             "assets/fonts/VonwaonBitmap-16px.ttf", 16);
+    if (!score_label) {
+        mylog::MyLog{}.error("Failed to create score label");
+        return;
+    }
+    auto screen_size = ui_manager_->getRootElement()->getSize();
+    score_label->setPosition(glm::vec2(screen_size.x - 100.0f, 10.0f));
+    score_label_ = score_label.get();
+    ui_manager_->addElement(std::move(score_label));
+}
+
+void GameScene::createHealthUi() {
+    int max_health = game_session_data_->getMaxHealth();
+    int current_health = game_session_data_->getCurrentHealth();
+    float start_x = 10.0f;
+    float start_y = 10.0f;
+    float icon_width = 20.0f;
+    float icon_height = 18.0f;
+    float spacing = 5.0f;
+    std::string full_heart_tex = "assets/textures/UI/Heart.png";
+    std::string empty_heart_tex = "assets/textures/UI/Heart-bg.png";
+
+    auto health_panel = std::make_unique<engine::ui::UiPanel>();
+    health_panel_ = health_panel.get();
+
+    for (int i = 0; i < max_health; ++i) {
+        glm::vec2 icon_pos{start_x + i * spacing + i * icon_width, start_y};
+        glm::vec2 icon_size{icon_width, icon_height};
+        auto bg_icon = std::make_unique<engine::ui::UiImage>(empty_heart_tex, icon_pos, icon_size);
+        health_panel_->addChild(std::move(bg_icon));
+    }
+    for (int i = 0; i < current_health; ++i) {
+        glm::vec2 icon_pos{start_x + i * spacing + i * icon_width, start_y};
+        glm::vec2 icon_size{icon_width, icon_height};
+        auto fg_icon = std::make_unique<engine::ui::UiImage>(full_heart_tex, icon_pos, icon_size);
+        health_panel_->addChild(std::move(fg_icon));
+    }
+
+    ui_manager_->addElement(std::move(health_panel));
+}
+
+void GameScene::addScoreWithUi(int score) {
+    game_session_data_->addScore(score);
+    score_label_->setText("Score : " + std::to_string(game_session_data_->getCurrentScore()));
+}
+
+void GameScene::healWithUi(int amount) {
+    player_->getComponent<engine::component::HealthComponent>()->heal(amount);
+    updateHealthWithUi();
+}
+
+void GameScene::updateHealthWithUi() {
+    if (!player_ || !health_panel_) { return; }
+    auto player_health_component = player_->getComponent<engine::component::HealthComponent>();
+    int current_health = player_health_component->getCurrentHealth();
+    auto max_health = player_health_component->getMaxHealth();
+    for (auto i = max_health; i < max_health * 2; ++i) {
+        health_panel_->getChildren()[i]->setVisible(i - max_health < current_health);
+    }
 }
 } // scene
 // game

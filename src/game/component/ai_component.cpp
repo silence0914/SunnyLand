@@ -53,7 +53,7 @@ void AiComponent::init() {
     }
 }
 
-void AiComponent::update(const float dt, engine::core::Context& context) {
+void AiComponent::update(const float dt, engine::core::Context&) {
     if (!current_behavior_) { return; }
     if (current_behavior_) {
         current_behavior_->update(dt, *this);

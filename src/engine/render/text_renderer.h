@@ -6,7 +6,7 @@
 #define TEXT_RENDERER_H
 #include <string>
 #include <glm/vec2.hpp>
-#include <SDL3/SDL_pixels.h>
+#include "../utils/math.h"
 
 namespace engine::render {
 class Camera;
@@ -45,7 +45,7 @@ public:
      * @param color  文字颜色
      */
     void drawUiText(const std::string& text, const std::string& font_id, int font_size, const glm::vec2& position,
-                    const SDL_FColor& color = {1.0f, 1.0f, 1.0f, 1.0f});
+                    const engine::utils::FColor& color = {1.0f, 1.0f, 1.0f, 1.0f});
 
     /**
      * @brief 绘制地图上的字符串
@@ -57,7 +57,7 @@ public:
      * @param color 文本颜色
      */
     void drawText(const engine::render::Camera& camera, const std::string& text, const std::string& font_id,
-                  int font_size, const glm::vec2& position, const SDL_FColor& color = {1.0f, 1.0f, 1.0f, 1.0f});
+                  int font_size, const glm::vec2& position, const engine::utils::FColor& color = {1.0f, 1.0f, 1.0f, 1.0f});
 
     /**
      * @brief 获取文本尺寸

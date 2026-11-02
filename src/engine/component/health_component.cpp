@@ -24,8 +24,8 @@ bool HealthComponent::takeDamage(int damage_amount) {
     return true;
 }
 
-void HealthComponent::heal(int heal_amount) {
-    if (heal_amount < 0 || !isAlive()) { return; }
+int HealthComponent::heal(int heal_amount) {
+    if (heal_amount < 0 || !isAlive()) { return 0; }
     setCurrentHealth(current_health_ + heal_amount);
 }
 

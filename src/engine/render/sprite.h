@@ -31,7 +31,7 @@ public:
     [[nodiscard]] std::optional<SDL_FRect> getSourceRect() const { return source_rect_; }
     void setSourceRect(const std::optional<SDL_FRect>& source_rect) { source_rect_ = source_rect; }
 
-    [[nodiscard]] bool isIsFlipped() const { return is_flipped_; }
+    [[nodiscard]] bool isFlipped() const { return is_flipped_; }
     void setIsFlipped(bool is_flipped) { is_flipped_ = is_flipped; }
 
 private:

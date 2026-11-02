@@ -22,7 +22,7 @@ public:
     HealthComponent& operator=(HealthComponent&& other) noexcept = delete;
 
     bool takeDamage(int damage_amount); // 伤害；
-    void heal(int heal_amount);         // 治疗
+    int heal(int heal_amount);         // 治疗
 
     // get/set
     [[nodiscard]] int getMaxHealth() const { return max_health_; }         // 最大血量

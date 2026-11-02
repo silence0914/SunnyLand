@@ -67,7 +67,7 @@ void Renderer::drawSprite(const Camera& camera, const Sprite& sprite, const glm:
                                   &dest_rect,
                                   angle,
                                   nullptr,
-                                  sprite.isIsFlipped() ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE)) {
+                                  sprite.isFlipped() ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE)) {
         spdlog::error("drawSprite failed; SDL_RenderTextureRotated failed;texture_id = {}; error = {}",
                       sprite.getTextureId(), SDL_GetError());
     }
@@ -140,7 +140,7 @@ void Renderer::drawUISprite(const Sprite& sprite, const glm::vec2& position, con
         dst_rect.h = size.value().y;
     }
     if (!SDL_RenderTextureRotated(renderer_, texture, &src_rect.value(), &dst_rect, 0.0, nullptr,
-                                  sprite.isIsFlipped() ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE)) {
+                                  sprite.isFlipped() ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE)) {
         spdlog::error("drawUISprite failed : SDL_RenderTextureRotated failed; texture id = {},sdl_error = {}",
                       sprite.getTextureId(), SDL_GetError());
     }

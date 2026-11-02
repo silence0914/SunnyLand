@@ -145,6 +145,10 @@ add_executable(${TARGET}
         src/engine/ui/ui_manager.h
         src/engine/ui/ui_panel.cpp
         src/engine/ui/ui_panel.h
+        src/engine/ui/ui_image.cpp
+        src/engine/ui/ui_image.h
+        src/engine/ui/ui_label.cpp
+        src/engine/ui/ui_label.h
 
 )
 
