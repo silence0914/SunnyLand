@@ -3,7 +3,6 @@
 //
 
 #include "ui_manager.h"
-
 #include "ui_panel.h"
 
 namespace engine {

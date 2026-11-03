@@ -7,6 +7,8 @@
 #include <memory>
 #include <glm/vec2.hpp>
 
+#include "ui_element.h"
+
 namespace engine::core {
 class Context;
 }
@@ -14,7 +16,6 @@ class Context;
 namespace engine {
 namespace ui {
 class UiPanel;
-class UiElement;
 
 class UiManager final {
 public:

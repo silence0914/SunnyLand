@@ -69,11 +69,15 @@ private:
     void healWithUi(int amount);    // 变更生命
     void updateHealthWithUi();      // 更新生命值ui；
 
+    // test
+    void createTestButton();
+    void testButtonClicked();
+
 private:
     engine::object::GameObject* player_{nullptr};
     std::shared_ptr<game::data::SessionData> game_session_data_; // 场景间数据共享；
-    engine::ui::UiLabel* score_label_{nullptr};                   // 得分标签, 生命周期由UiManager管理
-    engine::ui::UiPanel* health_panel_{nullptr};                  // 生命值图标面板;
+    engine::ui::UiLabel* score_label_{nullptr};                  // 得分标签, 生命周期由UiManager管理
+    engine::ui::UiPanel* health_panel_{nullptr};                 // 生命值图标面板;
 };
 } // scene
 

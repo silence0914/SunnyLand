@@ -136,7 +136,7 @@ void Renderer::drawUISprite(const Sprite& sprite, const glm::vec2& position, con
     }
     SDL_FRect dst_rect{position.x, position.y, src_rect.value().w, src_rect.value().h};
     if (size.has_value()) {
-        dst_rect.w = size.value().y;
+        dst_rect.w = size.value().x;
         dst_rect.h = size.value().y;
     }
     if (!SDL_RenderTextureRotated(renderer_, texture, &src_rect.value(), &dst_rect, 0.0, nullptr,

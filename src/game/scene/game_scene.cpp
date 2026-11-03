@@ -26,6 +26,7 @@
 #include "../../engine/render/text_renderer.h"
 #include "../../engine/scene/level_loader.h"
 #include "../../engine/scene/scene_manager.h"
+#include "../../engine/ui/ui_button.h"
 #include "../../engine/ui/ui_image.h"
 #include "../../engine/ui/ui_label.h"
 #include "../../engine/ui/ui_manager.h"
@@ -200,6 +201,7 @@ bool GameScene::initUi() {
     if (!ui_manager_->init(glm::vec2(context_.getCamera().getViewportSize()))) { return false; }
     createScoreUi();
     createHealthUi();
+    createTestButton();
     return true;
 }
 
@@ -391,6 +393,20 @@ void GameScene::updateHealthWithUi() {
     for (auto i = max_health; i < max_health * 2; ++i) {
         health_panel_->getChildren()[i]->setVisible(i - max_health < current_health);
     }
+}
+
+void GameScene::createTestButton() {
+    auto test_button = std::make_unique<engine::ui::UiButton>(context_, "assets/textures/UI/buttons/Start1.png",
+                                                              "assets/textures/UI/buttons/Start2.png",
+                                                              "assets/textures/UI/buttons/Start3.png",
+                                                              glm::vec2{100.0f, 100.0f},
+                                                              glm::vec2{0.0f},
+                                                              [this]() { this->testButtonClicked(); });
+    ui_manager_->addElement(std::move(test_button));
+}
+
+void GameScene::testButtonClicked() {
+    spdlog::info("testButtonClicked");
 }
 } // scene
 // game

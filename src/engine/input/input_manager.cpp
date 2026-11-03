@@ -43,6 +43,7 @@ void InputManager::update() {
     // 处理所有待处理的 SDL 事件；
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
+        // SDL_ConvertEventToRenderCoordinates(sdl_renderer_, &event);
         processEvent(event);
     }
 }
@@ -71,7 +72,7 @@ bool InputManager::isActionReleased(const std::string& action_name) const {
         spdlog::warn("isActionReleased, action '{}' not exit", action_name);
         return false;
     }
-    return it->second == ActionState::HELD_DOWN;
+    return it->second == ActionState::RELEASED_THIS_FRAME;
 }
 
 bool InputManager::shouldQuit() const {
@@ -124,11 +125,14 @@ void InputManager::processEvent(const SDL_Event& event) {
             for (const auto& actions_name: associated_actions) {
                 updateActionState(actions_name, is_down, false);
             }
-            mouse_position_ = {event.button.x, event.button.y};
+            SDL_RenderCoordinatesFromWindow(sdl_renderer_, event.button.x, event.button.y, &mouse_position_.x,
+                                            &mouse_position_.y);
+            // mouse_position_ = {event.button.x, event.button.y};
             break;
         }
         case SDL_EVENT_MOUSE_MOTION: {
-            mouse_position_ = {event.button.x, event.button.y};
+            SDL_RenderCoordinatesFromWindow(sdl_renderer_, event.motion.x, event.motion.y, &mouse_position_.x,
+                                            &mouse_position_.y);
             break;
         }
         case SDL_EVENT_QUIT: {

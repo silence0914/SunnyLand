@@ -14,6 +14,7 @@ constexpr  std::string_view MOVE_RIGHT = "move_right";
 constexpr  std::string_view JUMP = "jump";
 constexpr  std::string_view ATTACK = "attack";
 constexpr  std::string_view PAUSE = "pause";
+constexpr  std::string_view MOUSE_LEFT_CLICK = "MouseLeftClick";
 
 }
 
