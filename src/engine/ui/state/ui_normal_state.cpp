@@ -12,14 +12,14 @@ namespace engine {
 namespace ui {
 namespace state {
 void UiNormalState::enter() {
-    owner_->setSprite("normal");
+    owner_->setSprite(NORMAL);
 }
 
 std::unique_ptr<UiState> UiNormalState::handleInput(engine::core::Context& context) {
     auto& input_manager = context.getInputManager();
     auto mouse_position = input_manager.getMousePosition();
     if (owner_->isPointInside(mouse_position)) {
-        owner_->playSound("hover");
+        owner_->playSound(std::string{HOVER});
         return std::make_unique<engine::ui::state::UiHoverState>(owner_);
     }
     return nullptr;

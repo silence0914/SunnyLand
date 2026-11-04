@@ -31,12 +31,12 @@ void UiInteractive::addSprite(const std::string& name, std::unique_ptr<engine::r
     sprites_[name] = std::move(sprite);
 }
 
-void UiInteractive::setSprite(const std::string& name) {
+void UiInteractive::setSprite(std::string_view name) {
     if (name.empty()) {
         mylog::MyLog{}.warn("setSprite failed; name empty");
         return;
     }
-    auto it = sprites_.find(name);
+    auto it = sprites_.find(std::string{name});
     if (it == sprites_.end()) {
         mylog::MyLog{}.warn("setSprite failed; key '{}' is not exist", name);
         return;

@@ -16,7 +16,7 @@ namespace engine {
 namespace ui {
 namespace state {
 void UiHoverState::enter() {
-    owner_->setSprite("hover");
+    owner_->setSprite(HOVER);
 }
 
 std::unique_ptr<UiState> UiHoverState::handleInput(engine::core::Context& context) {

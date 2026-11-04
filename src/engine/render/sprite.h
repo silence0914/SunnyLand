@@ -25,10 +25,10 @@ public:
            bool is_flipped = false): texture_id_(std::move(texture_id)), source_rect_(source_rect),
                                      is_flipped_(is_flipped) {}
 
-    [[nodiscard]] std::string getTextureId() const { return texture_id_; }
+    [[nodiscard]]const std::string& getTextureId() const { return texture_id_; }
     void setTextureId(const std::string& texture_id) { texture_id_ = texture_id; }
 
-    [[nodiscard]] std::optional<SDL_FRect> getSourceRect() const { return source_rect_; }
+    [[nodiscard]]const std::optional<SDL_FRect>& getSourceRect() const { return source_rect_; }
     void setSourceRect(const std::optional<SDL_FRect>& source_rect) { source_rect_ = source_rect; }
 
     [[nodiscard]] bool isFlipped() const { return is_flipped_; }

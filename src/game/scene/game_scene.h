@@ -69,9 +69,6 @@ private:
     void healWithUi(int amount);    // 变更生命
     void updateHealthWithUi();      // 更新生命值ui；
 
-    // test
-    void createTestButton();
-    void testButtonClicked();
 
 private:
     engine::object::GameObject* player_{nullptr};

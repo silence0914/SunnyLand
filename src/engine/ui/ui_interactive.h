@@ -21,7 +21,7 @@ public:
 
     virtual void clicked() {}                                                                // 点击事件；
     void addSprite(const std::string& name, std::unique_ptr<engine::render::Sprite> sprite); // 添加精灵
-    void setSprite(const std::string& name);                                                 // 设置当前显示的精灵
+    void setSprite(std::string_view name);                                                 // 设置当前显示的精灵
     void addSound(const std::string& name, const std::string& path);                         // 添加音效；
     void playSound(const std::string& name);                                                 // 播放音效
 

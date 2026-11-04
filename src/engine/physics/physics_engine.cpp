@@ -384,6 +384,7 @@ void PhysicsEngine::update(const float dt) {
 
 
 void PhysicsEngine::checkObjectCollisions() {
+    if (components_.empty()) { return; }
     for (int i = 0; i < components_.size() - 1; ++i) {
         auto& pc_a = components_[i];
         if (!pc_a->isEnabled()) { continue; }

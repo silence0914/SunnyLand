@@ -152,12 +152,13 @@ void InputManager::initializeMappings(const engine::core::Config* config) {
     actions_to_keyname_map_ = config->input_mappings_;
     input_to_actions_map_.clear();
     action_states_.clear();
-
-    if (actions_to_keyname_map_.find("MouseLeftClick") == actions_to_keyname_map_.end()) {
-        actions_to_keyname_map_["MouseLeftClick"] = {"MouseLeft"};
+    auto mouse_left_click = std::string{utils::action::MOUSE_LEFT_CLICK};
+    auto mouse_right_click = std::string{utils::action::MOUSE_RIGHT_CLICK};
+    if (actions_to_keyname_map_.find(mouse_left_click) == actions_to_keyname_map_.end()) {
+        actions_to_keyname_map_[mouse_left_click] = {"MouseLeft"};
     }
-    if (actions_to_keyname_map_.find("MouseRightClick") == actions_to_keyname_map_.end()) {
-        actions_to_keyname_map_["MouseRightClick"] = {"MouseRight"};
+    if (actions_to_keyname_map_.find(mouse_right_click) == actions_to_keyname_map_.end()) {
+        actions_to_keyname_map_[mouse_right_click] = {"MouseRight"};
     }
 
     for (const auto& [action_name,key_names]: actions_to_keyname_map_) {

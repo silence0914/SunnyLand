@@ -77,12 +77,7 @@ void GameScene::init() {
         context_.getInputManager().setShouldQuit(true);
         return;
     }
-
-    // 设置音量
-    context_.getAudioPlayer().setMusicVolume(0.2f);
-    context_.getAudioPlayer().setSoundVolume(0.5f);
-
-    context_.getAudioPlayer().playMusic("assets/audio/hurry_up_and_run.ogg", -1, 1000);
+    // context_.getAudioPlayer().playMusic("assets/audio/hurry_up_and_run.ogg", -1, 1000);
 
     Scene::init();
     mylog::MyLog{}.trace("init success");
@@ -131,8 +126,14 @@ bool GameScene::initLevel() {
     // 注册到物理层
     context_.getPhysicsEngine().registerCollisionLayer(*tile_layer);
 
+    // 设置相机边界
     auto world_size = tile_layer->getWorldSize();
     context_.getCamera().setLimitBounds(engine::utils::Rect{glm::vec2{0.0f}, world_size});
+    //  初始化相机位置， 避免切换场景时晃动；
+    context_.getCamera().setPosition(glm::vec2(0.0f));
+
+    context_.getPhysicsEngine().setWorldBounds(engine::utils::Rect{glm::vec2{0.0f, 0.0f}, world_size});
+
     spdlog::trace("initLevel success; scene_name = '{}'", scene_name_);
     return true;
 }
@@ -201,7 +202,6 @@ bool GameScene::initUi() {
     if (!ui_manager_->init(glm::vec2(context_.getCamera().getViewportSize()))) { return false; }
     createScoreUi();
     createHealthUi();
-    createTestButton();
     return true;
 }
 
@@ -241,7 +241,7 @@ void GameScene::handleTileTriggers() {
         auto* obj = event.first;
         auto tile_type = event.second;
         if (tile_type == engine::component::TileType::HAZARD) {
-            if (obj->getName() == "player") { obj->getComponent<game::component::PlayerComponent>()->takeDamage(1); }
+            if (obj->getName() == "player") { handlePlayerDamage(1); }
         }
     }
 }
@@ -393,20 +393,6 @@ void GameScene::updateHealthWithUi() {
     for (auto i = max_health; i < max_health * 2; ++i) {
         health_panel_->getChildren()[i]->setVisible(i - max_health < current_health);
     }
-}
-
-void GameScene::createTestButton() {
-    auto test_button = std::make_unique<engine::ui::UiButton>(context_, "assets/textures/UI/buttons/Start1.png",
-                                                              "assets/textures/UI/buttons/Start2.png",
-                                                              "assets/textures/UI/buttons/Start3.png",
-                                                              glm::vec2{100.0f, 100.0f},
-                                                              glm::vec2{0.0f},
-                                                              [this]() { this->testButtonClicked(); });
-    ui_manager_->addElement(std::move(test_button));
-}
-
-void GameScene::testButtonClicked() {
-    spdlog::info("testButtonClicked");
 }
 } // scene
 // game

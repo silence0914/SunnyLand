@@ -5,6 +5,7 @@
 #ifndef UI_STATE_H
 #define UI_STATE_H
 #include <memory>
+#include <string_view>
 
 namespace engine::core {
 class Context;
@@ -17,6 +18,9 @@ class UiInteractive;
 namespace engine {
 namespace ui {
 namespace state {
+constexpr std::string_view HOVER{"hover"};
+constexpr std::string_view NORMAL{"normal"};
+constexpr std::string_view PRESSED{"pressed"};
 /**
  * @brief 可交互元素再特定状态下的行为接口
  */

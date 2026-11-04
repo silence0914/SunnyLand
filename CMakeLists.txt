@@ -160,6 +160,10 @@ add_executable(${TARGET}
         src/engine/ui/state/ui_hover_state.h
         src/engine/ui/state/ui_pressed_state.cpp
         src/engine/ui/state/ui_pressed_state.h
+        src/game/scene/title_scene.cpp
+        src/game/scene/title_scene.h
+        src/game/scene/helps_scene.cpp
+        src/game/scene/helps_scene.h
 
 )
 

@@ -12,6 +12,7 @@
 #include "config.h"
 #include "context.h"
 #include "../../game/scene/game_scene.h"
+#include "../../game/scene/title_scene.h"
 #include "../audio/audio_player.h"
 #include "../component/sprite_component.h"
 #include "../render/camera.h"
@@ -67,7 +68,9 @@ bool GameApp::init() {
     if (!initTextRenderer()) { return false; }
 
     if (!initContext()) { return false; }
-    auto scene = std::make_unique<game::scene::GameScene>(*context_, *scene_manager_);
+
+    // 创建主页场景并入栈
+    auto scene = std::make_unique<game::scene::TitleScene>(*context_, *scene_manager_);
     scene_manager_->requestPushScene(std::move(scene));
 
     if (!initTime()) { return false; }

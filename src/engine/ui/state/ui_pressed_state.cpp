@@ -14,8 +14,8 @@ namespace engine {
 namespace ui {
 namespace state {
 void UiPressedState::enter() {
-    owner_->setSprite("pressed");
-    owner_->playSound("pressed");
+    owner_->setSprite(PRESSED);
+    owner_->playSound(std::string{PRESSED});
 }
 
 std::unique_ptr<UiState> UiPressedState::handleInput(engine::core::Context& context) {
