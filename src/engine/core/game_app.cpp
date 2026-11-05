@@ -11,6 +11,7 @@
 
 #include "config.h"
 #include "context.h"
+#include "game_state.h"
 #include "../../game/scene/game_scene.h"
 #include "../../game/scene/title_scene.h"
 #include "../audio/audio_player.h"
@@ -66,6 +67,7 @@ bool GameApp::init() {
     if (!initPhysicsEngine()) { return false; }
     if (!initAudioPlayer()) { return false; }
     if (!initTextRenderer()) { return false; }
+    if (!initGameState()) { return false; }
 
     if (!initContext()) { return false; }
 
@@ -225,7 +227,8 @@ bool GameApp::initInputManager() {
 bool GameApp::initContext() {
     try {
         context_ = std::make_unique<engine::core::Context>(*camera_, *renderer_, *input_manager_, *resource_manager_,
-                                                           *physics_engine_, *audio_player_, *text_renderer_);
+                                                           *physics_engine_, *audio_player_, *text_renderer_,
+                                                           *game_state_);
     } catch (const std::exception& e) {
         spdlog::error("initContext failed; error : {}", e.what());
         return false;
@@ -268,6 +271,16 @@ bool GameApp::initTextRenderer() {
         text_renderer_ = std::make_unique<engine::render::TextRenderer>(sdl_renderer_, *resource_manager_);
     } catch (const std::exception& e) {
         spdlog::error("initTextRenderer failed;error : {}", e.what());
+        return false;
+    }
+    return true;
+}
+
+bool GameApp::initGameState() {
+    try {
+        game_state_ = std::make_unique<engine::core::GameState>(window_, sdl_renderer_);
+    } catch (const std::exception& e) {
+        spdlog::error("initGameState failed;error : {}", e.what());
         return false;
     }
     return true;

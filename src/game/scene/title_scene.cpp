@@ -10,6 +10,7 @@
 #include "helps_scene.h"
 #include "../../engine/audio/audio_player.h"
 #include "../../engine/core/context.h"
+#include "../../engine/core/game_state.h"
 #include "../../engine/input/input_manager.h"
 #include "../../engine/log/my_log.h"
 #include "../../engine/render/camera.h"
@@ -52,6 +53,7 @@ void TitleScene::update(float dt) {
 
 void TitleScene::createUi() {
     auto window_size = context_.getCamera().getViewportSize();
+    context_.getGameState().setState(engine::core::State::TITLE);
     if (!ui_manager_->init(window_size)) {
         spdlog::error("Failed to init ui manager");
         return;
@@ -150,7 +152,7 @@ void TitleScene::onLoadGameClick() {
         mylog::MyLog{}.error("No session data to load game");
         return;
     }
-    if (session_data_->loadFromFile("assets/save.json")) {
+    if (session_data_->loadFromFile(game::data::DEFAULT_SAVE_PATH)) {
         scene_manager_.requestReplaceScene(std::make_unique<GameScene>(context_, scene_manager_, session_data_));
     } else {
         mylog::MyLog{}.warn("Failed to load game from file");

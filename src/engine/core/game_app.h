@@ -6,7 +6,6 @@
 #define GAME_APP_H
 
 #include <memory>
-#include <chrono>
 
 
 namespace engine::audio {
@@ -46,6 +45,7 @@ namespace engine::core {
 class Time;
 class Config;
 class Context;
+class GameState;
 
 class GameApp final {
 public:
@@ -77,6 +77,7 @@ private:
     [[nodiscard]] bool initPhysicsEngine();
     [[nodiscard]] bool initAudioPlayer();
     [[nodiscard]] bool initTextRenderer();
+    [[nodiscard]] bool initGameState();
 
 private:
     SDL_Window* window_{nullptr};
@@ -94,6 +95,7 @@ private:
     std::unique_ptr<engine::physics::PhysicsEngine> physics_engine_;      // 物理引擎
     std::unique_ptr<engine::audio::AudioPlayer> audio_player_;            // 音频播放器
     std::unique_ptr<engine::render::TextRenderer> text_renderer_;         // 文本渲染器
+    std::unique_ptr<engine::core::GameState> game_state_;                 // 游戏状态管理
 };
 }
 

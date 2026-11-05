@@ -8,6 +8,8 @@
 
 namespace game {
 namespace data {
+static const inline std::string DEFAULT_SAVE_PATH{"assets/save.json"};
+
 class SessionData final {
 public:
     SessionData() = default;
@@ -46,9 +48,8 @@ private:
     int high_score_ = 0;
 
     int level_health_ = 3; // 进入关卡时最大血量
-    int level_score_ = 0; // 进入关卡是的得分
+    int level_score_ = 0;  // 进入关卡是的得分
     std::string map_path_ = "assets/maps/level1.tmj";
-
 };
 } // data
 } // game

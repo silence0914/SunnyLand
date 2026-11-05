@@ -28,6 +28,7 @@ class TextRenderer;
 }
 
 namespace engine::core {
+class GameState;
 /**
  * @brief 上下文管理类；
  *
@@ -41,7 +42,8 @@ public:
             engine::resource::ResourceManager& resource_manager,
             engine::physics::PhysicsEngine& physics_engine,
             engine::audio::AudioPlayer& audio_player,
-            engine::render::TextRenderer& text_renderer
+            engine::render::TextRenderer& text_renderer,
+            engine::core::GameState& game_state
     );
 
     ~Context() = default;
@@ -59,6 +61,7 @@ public:
     [[nodiscard]] engine::physics::PhysicsEngine& getPhysicsEngine() const { return physics_engine_; }
     [[nodiscard]] engine::audio::AudioPlayer& getAudioPlayer() const { return audio_player_; }
     [[nodiscard]] engine::render::TextRenderer& getTextRenderer() const { return text_renderer_; }
+    [[nodiscard]] engine::core::GameState& getGameState() const { return game_state_; }
 
 private:
     engine::render::Camera& camera_;
@@ -68,6 +71,7 @@ private:
     engine::physics::PhysicsEngine& physics_engine_;
     engine::audio::AudioPlayer& audio_player_;
     engine::render::TextRenderer& text_renderer_;
+    engine::core::GameState& game_state_;
 };
 } // core
 // engine

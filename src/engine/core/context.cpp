@@ -14,14 +14,16 @@ Context::Context(engine::render::Camera& camera,
                  engine::resource::ResourceManager& resource_manager,
                  engine::physics::PhysicsEngine& physics_engine,
                  engine::audio::AudioPlayer& audio_player,
-                 engine::render::TextRenderer& text_renderer)
+                 engine::render::TextRenderer& text_renderer,
+                 engine::core::GameState& game_state)
     : camera_(camera),
       renderer_(renderer),
       input_manager_(input_manager),
       resource_manager_(resource_manager),
       physics_engine_(physics_engine),
       audio_player_(audio_player),
-      text_renderer_(text_renderer) {
+      text_renderer_(text_renderer),
+      game_state_(game_state) {
     spdlog::debug("create Context completion");
 }
 } // core

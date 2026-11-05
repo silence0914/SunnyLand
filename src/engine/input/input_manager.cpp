@@ -29,7 +29,7 @@ void InputManager::update() {
     // 根据上一帧的状态，更新默认的动作状态；
     for (auto& [action,state]: action_states_) {
         if (state == ActionState::INACTIVE) {
-            break;
+            continue;
         }
         if (state == ActionState::PRESSED_THIS_FRAME) {
             state = ActionState::HELD_DOWN;

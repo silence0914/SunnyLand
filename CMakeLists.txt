@@ -164,6 +164,10 @@ add_executable(${TARGET}
         src/game/scene/title_scene.h
         src/game/scene/helps_scene.cpp
         src/game/scene/helps_scene.h
+        src/engine/core/game_state.cpp
+        src/engine/core/game_state.h
+        src/game/scene/menu_scene.cpp
+        src/game/scene/menu_scene.h
 
 )
 

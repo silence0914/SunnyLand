@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include "menu_scene.h"
 #include "../../engine/audio/audio_player.h"
 #include "../../engine/object/game_object.h"
 #include "../../engine/component/collider_component.h"
@@ -17,6 +18,7 @@
 #include "../../engine/component/health_component.h"
 #include "../../engine/component/sprite_component.h"
 #include "../../engine/core/context.h"
+#include "../../engine/core/game_state.h"
 #include "../../engine/input/input_manager.h"
 #include "../../engine/log/log_manager.h"
 #include "../../engine/log/my_log.h"
@@ -53,7 +55,7 @@ GameScene::GameScene(engine::core::Context& context,
 
 void GameScene::init() {
     if (isInitialized()) { return; }
-
+    context_.getGameState().setState(engine::core::State::PLAYING);
     if (!initLevel()) {
         mylog::MyLog{}.error("scene init failed;");
         context_.getInputManager().setShouldQuit(true);
@@ -85,6 +87,10 @@ void GameScene::init() {
 
 void GameScene::handleInput() {
     Scene::handleInput();
+    if (context_.getInputManager().isActionPressed("pause")) {
+        scene_manager_.requestPushScene(std::make_unique<game::scene::MenuScene>(context_, scene_manager_,
+                                                                                 game_session_data_));
+    }
 }
 
 void GameScene::update(const float dt) {
@@ -199,7 +205,7 @@ bool GameScene::initEnemyAndItem() {
 }
 
 bool GameScene::initUi() {
-    if (!ui_manager_->init(glm::vec2(context_.getCamera().getViewportSize()))) { return false; }
+    if (!ui_manager_->init(context_.getGameState().getLogicalSize())) { return false; }
     createScoreUi();
     createHealthUi();
     return true;

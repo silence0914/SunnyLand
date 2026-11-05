@@ -7,6 +7,7 @@
 #include <spdlog/spdlog.h>
 
 #include "../core/context.h"
+#include "../core/game_state.h"
 #include "../object/game_object.h"
 #include "../physics/physics_engine.h"
 #include "../render/camera.h"
@@ -59,12 +60,14 @@ void Scene::update(const float dt) {
         ++it;
     }
 
+    // 游戏进行中才需要更新物理引擎和相机；
+    if (context_.getGameState().isPlaying()) {
+        // 更新物理引擎；
+        context_.getPhysicsEngine().update(dt);
+        // 更新相机
+        context_.getCamera().update(dt);
+    }
 
-    // 更新物理引擎；
-    context_.getPhysicsEngine().update(dt);
-
-    // 更新相机
-    context_.getCamera().update(dt);
 
     for (auto& object: game_objects_) {
         object->update(dt, context_);
