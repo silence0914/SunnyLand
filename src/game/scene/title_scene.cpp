@@ -124,7 +124,7 @@ void TitleScene::createUi() {
                                                               "assets/textures/UI/buttons/Quit3.png",
                                                               current_button_pos,
                                                               button_size,
-                                                              [this]() { this->onHelpClick(); });
+                                                              [this]() { this->onQuitClick(); });
     button_panel->addChild(std::move(quit_button));
     // ui_panel 添加入ui管理器；
     ui_manager_->addElement(std::move(button_panel));

@@ -6,6 +6,7 @@
 
 #include <utility>
 
+#include "end_scene.h"
 #include "menu_scene.h"
 #include "../../engine/audio/audio_player.h"
 #include "../../engine/object/game_object.h"
@@ -55,7 +56,10 @@ GameScene::GameScene(engine::core::Context& context,
 
 void GameScene::init() {
     if (isInitialized()) { return; }
+
     context_.getGameState().setState(engine::core::State::PLAYING);
+    game_session_data_->syncHighScore(data::DEFAULT_SAVE_PATH);
+
     if (!initLevel()) {
         mylog::MyLog{}.error("scene init failed;");
         context_.getInputManager().setShouldQuit(true);
@@ -97,6 +101,14 @@ void GameScene::update(const float dt) {
     Scene::update(dt);
     handleObjectCollisions();
     handleTileTriggers();
+
+    if (player_) {
+        auto pos = player_->getComponent<engine::component::TransformComponent>()->getPosition();
+        auto world_rect = context_.getPhysicsEngine().getWorldBounds();
+        if (world_rect && pos.y > world_rect->position.y + world_rect->size.y + 100.0f) {
+            showEndScene(false);
+        }
+    }
 }
 
 void GameScene::render() {
@@ -156,6 +168,14 @@ bool GameScene::initPlayer() {
     auto* player_component = player_->addComponent<game::component::PlayerComponent>();
     if (!player_component) {
         mylog::MyLog{}.error("'{}' initPlayer failed;addPlayerComponent failed;", scene_name_);
+        return false;
+    }
+
+    if (auto health_component = player_->getComponent<engine::component::HealthComponent>(); health_component) {
+        health_component->setMaxHealth(game_session_data_->getMaxHealth());
+        health_component->setCurrentHealth(game_session_data_->getCurrentHealth());
+    } else {
+        mylog::MyLog{}.error("'{}' initPlayer failed;findHealthComponent failed;", scene_name_);
         return false;
     }
 
@@ -236,6 +256,8 @@ void GameScene::handleObjectCollisions() {
                 handlePlayerDamage(1);
             } else if (other->getTag() == "next_level") {
                 toNextLevel(other);
+            } else if (other->getName() == "win") {
+                showEndScene(true);
             }
         }
     }
@@ -305,6 +327,12 @@ void GameScene::toNextLevel(engine::object::GameObject* trigger) {
     game_session_data_->setNextLevel(map_path);
     auto next_scene = std::make_unique<game::scene::GameScene>(context_, scene_manager_, game_session_data_);
     scene_manager_.requestReplaceScene(std::move(next_scene));
+}
+
+void GameScene::showEndScene(bool is_win) {
+    game_session_data_->setIsWin(is_win);
+    auto end_scene = std::make_unique<game::scene::EndScene>(context_, scene_manager_, game_session_data_);
+    scene_manager_.requestPushScene(std::move(end_scene));
 }
 
 void GameScene::createEffect(const glm::vec2& center_pos, const std::string& tag) {

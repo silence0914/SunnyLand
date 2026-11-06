@@ -17,7 +17,7 @@ void UiNormalState::enter() {
 
 std::unique_ptr<UiState> UiNormalState::handleInput(engine::core::Context& context) {
     auto& input_manager = context.getInputManager();
-    auto mouse_position = input_manager.getMousePosition();
+    auto mouse_position = input_manager.getLogicalMousePosition();
     if (owner_->isPointInside(mouse_position)) {
         owner_->playSound(std::string{HOVER});
         return std::make_unique<engine::ui::state::UiHoverState>(owner_);

@@ -168,6 +168,8 @@ add_executable(${TARGET}
         src/engine/core/game_state.h
         src/game/scene/menu_scene.cpp
         src/game/scene/menu_scene.h
+        src/game/scene/end_scene.cpp
+        src/game/scene/end_scene.h
 
 )
 

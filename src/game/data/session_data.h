@@ -27,6 +27,7 @@ public:
     [[nodiscard]] int getLevelHealth() const { return level_health_; }
     [[nodiscard]] int getLevelScore() const { return level_score_; }
     [[nodiscard]] std::string getMapPath() const { return map_path_; }
+    [[nodiscard]] bool getIsWin() const { return is_win; }
 
     void setCurrentHealth(int current_health) { current_health_ = current_health; }
     void setMaxHealth(int max_health);
@@ -35,17 +36,20 @@ public:
     void setLevelHealth(int level_health) { level_health_ = level_health; }
     void setLevelScore(int level_score) { level_score_ = level_score; }
     void setMapPath(const std::string& map_path) { map_path_ = map_path; }
+    void setIsWin(bool is_win) { this->is_win = is_win; }
 
     void reset();                                       // 重置游戏数据
     void setNextLevel(const std::string& map_path);     // 设置下一个场景信息
     bool saveToFile(const std::string& filename) const; // 将当前游戏数据保存到文件
     bool loadFromFile(const std::string& filename);     // 从文件中读取游戏数据；
+    bool syncHighScore(const std::string& filename);    // 同步最高分;
 
 private:
     int current_health_ = 3;
     int max_health_ = 3;
     int current_score_ = 0;
     int high_score_ = 0;
+    bool is_win{false};
 
     int level_health_ = 3; // 进入关卡时最大血量
     int level_score_ = 0;  // 进入关卡是的得分

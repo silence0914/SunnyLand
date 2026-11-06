@@ -59,7 +59,7 @@ void Camera::setPosition(const glm::vec2& position) {
 
 engine::component::TransformComponent* Camera::getTarget() const { return target_; }
 
-void Camera::setLimitBounds(const std::optional<engine::utils::Rect>& limit_bounds) {
+void Camera::setLimitBounds(std::optional<engine::utils::Rect> limit_bounds) {
     limit_bounds_ = limit_bounds;
 }
 

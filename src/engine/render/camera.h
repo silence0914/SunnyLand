@@ -42,7 +42,7 @@ public:
     [[nodiscard]] engine::component::TransformComponent* getTarget() const;                            // 获取跟随目标变换的组件；
 
 
-    void setLimitBounds(const std::optional<engine::utils::Rect>& limit_bounds); // 设置相机移动范围；
+    void setLimitBounds(std::optional<engine::utils::Rect> limit_bounds); // 设置相机移动范围；
     void setPosition(const glm::vec2& position);                                 // 设置相机坐标
     void setViewportSize(const glm::vec2& viewport_size);                        // 设置视窗大小；
     void setTarget(engine::component::TransformComponent& target);               // 设置跟随目标变换的组件；

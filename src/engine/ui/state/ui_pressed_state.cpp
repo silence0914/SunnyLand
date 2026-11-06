@@ -20,7 +20,7 @@ void UiPressedState::enter() {
 
 std::unique_ptr<UiState> UiPressedState::handleInput(engine::core::Context& context) {
     auto& input_manager = context.getInputManager();
-    auto mouse_position = input_manager.getMousePosition();
+    auto mouse_position = input_manager.getLogicalMousePosition();
     // 松开左键
     if (input_manager.isActionReleased("MouseLeftClick")) {
         // 如果松开时，光标在按键范围内

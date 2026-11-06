@@ -53,6 +53,8 @@ private:
     void playerVsEnemyCollision(engine::object::GameObject& player, engine::object::GameObject& enemy); // 玩家与敌人的碰撞
     void playerVsItemCollision(engine::object::GameObject& player, engine::object::GameObject& item);   // 玩家与道具间碰撞；
     void toNextLevel(engine::object::GameObject* trigger);                                              // 进入下一关
+    void showEndScene(bool is_win);
+
     std::string levelNameToPath(const std::string& level_name) const { return "assets/maps/" + level_name + ".tmj"; }
 
     /**

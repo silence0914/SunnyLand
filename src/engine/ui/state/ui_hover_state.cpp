@@ -21,7 +21,7 @@ void UiHoverState::enter() {
 
 std::unique_ptr<UiState> UiHoverState::handleInput(engine::core::Context& context) {
     auto& input_manager = context.getInputManager();
-    auto mouse_position = input_manager.getMousePosition();
+    auto mouse_position = input_manager.getLogicalMousePosition();
     if (!owner_->isPointInside(mouse_position)) {
         return std::make_unique<engine::ui::state::UiNormalState>(owner_);
     }
